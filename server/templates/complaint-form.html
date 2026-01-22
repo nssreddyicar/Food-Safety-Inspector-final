@@ -1,0 +1,526 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Submit Complaint - Food Safety Inspector</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f3f4f6; min-height: 100vh; }
+      .header { background: #1E40AF; color: white; padding: 16px 24px; text-align: center; }
+      .header-logo { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
+      .header-logo svg { width: 32px; height: 32px; fill: white; }
+      .header-title { font-size: 20px; font-weight: 600; }
+      .header-subtitle { font-size: 14px; opacity: 0.9; }
+      .main { padding: 24px; max-width: 600px; margin: 0 auto; }
+      .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 24px; margin-bottom: 20px; }
+      .card-title { font-size: 18px; font-weight: 600; color: #1f2937; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+      .card-title svg { width: 20px; height: 20px; fill: #1E40AF; }
+      .info-card { background: #eff6ff; border: 1px solid #bfdbfe; padding: 16px; border-radius: 8px; margin-bottom: 20px; }
+      .info-card p { color: #1e40af; font-size: 14px; line-height: 1.5; }
+      .shared-link-badge { background: #d1fae5; color: #059669; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+      .shared-link-badge svg { width: 16px; height: 16px; fill: #059669; }
+      .copy-link-btn { background: #059669; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; margin-left: 8px; display: inline-flex; align-items: center; gap: 4px; }
+      .copy-link-btn:hover { background: #047857; }
+      .copy-link-btn svg { width: 12px; height: 12px; fill: white; }
+      .form-group { margin-bottom: 16px; }
+      .form-label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+      .form-label .required { color: #dc2626; }
+      .form-input, .form-select, .form-textarea { width: 100%; padding: 12px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; transition: border-color 0.2s; }
+      .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #1E40AF; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+      .form-textarea { min-height: 100px; resize: vertical; }
+      .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+      .location-btn { background: #1E40AF; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+      .location-btn:hover { background: #1e3a8a; }
+      .location-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+      .location-btn svg { width: 18px; height: 18px; fill: white; }
+      .location-info { background: #d1fae5; color: #059669; padding: 12px; border-radius: 8px; font-size: 13px; margin-top: 12px; display: flex; align-items: center; gap: 8px; }
+      .location-info svg { width: 16px; height: 16px; fill: #059669; flex-shrink: 0; }
+      .evidence-section { margin-top: 16px; }
+      .evidence-note { font-size: 13px; color: #6b7280; margin-bottom: 12px; }
+      .file-input-wrapper { position: relative; }
+      .file-input { width: 100%; padding: 40px; border: 2px dashed #d1d5db; border-radius: 8px; text-align: center; cursor: pointer; transition: border-color 0.2s; }
+      .file-input:hover { border-color: #1E40AF; }
+      .file-input input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+      .file-input svg { width: 32px; height: 32px; fill: #9ca3af; margin-bottom: 8px; }
+      .file-input p { color: #6b7280; font-size: 14px; }
+      .file-preview { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+      .file-preview-item { position: relative; width: 80px; height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid #e5e7eb; }
+      .file-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+      .file-preview-remove { position: absolute; top: 4px; right: 4px; background: #dc2626; color: white; border: none; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+      .submit-btn { background: #059669; color: white; border: none; padding: 14px 24px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 24px; }
+      .submit-btn:hover { background: #047857; }
+      .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+      .error-message { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+      .success-card { text-align: center; padding: 40px 24px; }
+      .success-icon { width: 64px; height: 64px; background: #d1fae5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+      .success-icon svg { width: 32px; height: 32px; fill: #059669; }
+      .success-title { font-size: 24px; font-weight: 600; color: #1f2937; margin-bottom: 12px; }
+      .success-message { color: #6b7280; font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+      .complaint-code { background: #f3f4f6; border: 2px dashed #d1d5db; padding: 16px; border-radius: 8px; margin-bottom: 24px; }
+      .complaint-code-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+      .complaint-code-value { font-size: 24px; font-weight: 700; color: #1E40AF; font-family: monospace; letter-spacing: 2px; }
+      .loading { display: flex; align-items: center; justify-content: center; padding: 60px; }
+      .spinner { width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #1E40AF; border-radius: 50%; animation: spin 0.8s linear infinite; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .hidden { display: none; }
+      .invalid-link { text-align: center; padding: 60px 24px; }
+      .invalid-link svg { width: 64px; height: 64px; fill: #dc2626; margin-bottom: 20px; }
+      .invalid-link h2 { font-size: 20px; color: #1f2937; margin-bottom: 12px; }
+      .invalid-link p { color: #6b7280; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        <span class="header-title">Food Safety Inspector</span>
+      </div>
+      <div class="header-subtitle">Government of India - FSSAI</div>
+    </header>
+
+    <main class="main">
+      <div id="loadingState" class="card loading">
+        <div class="spinner"></div>
+      </div>
+
+      <div id="invalidLinkState" class="card invalid-link hidden">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <h2>Invalid or Expired Link</h2>
+        <p id="invalidLinkMessage">This complaint submission link is invalid or has already been used.</p>
+      </div>
+
+      <div id="formState" class="hidden">
+        <div id="sharedLinkInfo" class="shared-link-badge hidden">
+          <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+          <span id="sharedLinkText">Verified Link</span>
+          <button type="button" class="copy-link-btn" onclick="copyLink()">
+            <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            <span id="copyBtnText">Copy</span>
+          </button>
+        </div>
+
+        <div class="info-card">
+          <p>Report food safety violations such as expired products, unsanitary conditions, adulteration, or any health hazards. Your complaint will be reviewed by a Food Safety Officer.</p>
+        </div>
+
+        <div id="errorMessage" class="error-message hidden"></div>
+
+        <form id="complaintForm">
+          <div id="dynamicFormFields"></div>
+          <button type="submit" class="submit-btn" id="submitBtn">Submit Complaint</button>
+        </form>
+      </div>
+
+      <div id="successState" class="card success-card hidden">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <h2 class="success-title">Complaint Submitted!</h2>
+        <p class="success-message">Your complaint has been registered successfully. Please save your complaint ID for tracking.</p>
+        <div class="complaint-code">
+          <div class="complaint-code-label">Complaint ID</div>
+          <div class="complaint-code-value" id="complaintCode">-</div>
+        </div>
+        <p class="success-message">A Food Safety Officer will review your complaint and take appropriate action. You can track the status using your complaint ID.</p>
+      </div>
+    </main>
+
+    <script>
+      let sharedLinkData = null;
+      let selectedFiles = [];
+
+      function copyLink() {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+          const btn = document.getElementById('copyBtnText');
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+        }).catch(() => {
+          alert('Failed to copy link');
+        });
+      }
+
+      async function init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (token) {
+          try {
+            const res = await fetch(`/api/complaints/share-link/${token}`);
+            const data = await res.json();
+            
+            if (!res.ok) {
+              showInvalidLink(data.error || 'Invalid link');
+              return;
+            }
+            
+            sharedLinkData = data;
+            document.getElementById('sharedLinkInfo').classList.remove('hidden');
+            if (data.districtAbbreviation) {
+              document.getElementById('sharedLinkText').textContent = `Verified Link - District: ${data.districtAbbreviation}`;
+            }
+          } catch (e) {
+            showInvalidLink('Failed to validate link');
+            return;
+          }
+        }
+
+        await loadFormConfig();
+        showForm();
+      }
+
+      let formConfig = [];
+      let maxFilesAllowed = 3;
+      
+      const groupIcons = {
+        complainant: '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>',
+        establishment: '<svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>',
+        incident: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>',
+        location: '<svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>',
+        evidence: '<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>'
+      };
+      
+      const groupTitles = {
+        complainant: 'Your Details',
+        establishment: 'Establishment Details',
+        incident: 'Incident Details',
+        location: 'Location',
+        evidence: 'Evidence'
+      };
+
+      async function loadFormConfig() {
+        try {
+          const res = await fetch('/api/complaints/form-config');
+          formConfig = await res.json();
+          
+          // Filter active fields and group them
+          const activeFields = formConfig.filter(f => f.isActive);
+          const groups = {};
+          
+          activeFields.forEach(field => {
+            const group = field.fieldGroup || 'incident';
+            if (!groups[group]) groups[group] = [];
+            groups[group].push(field);
+          });
+          
+          // Sort fields within each group by displayOrder
+          Object.keys(groups).forEach(g => {
+            groups[g].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+          });
+          
+          // Build form HTML
+          const container = document.getElementById('dynamicFormFields');
+          const groupOrder = ['complainant', 'establishment', 'incident', 'location', 'evidence'];
+          
+          groupOrder.forEach(groupName => {
+            if (!groups[groupName] || groups[groupName].length === 0) return;
+            
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            let cardHTML = `<div class="card-title">${groupIcons[groupName] || ''}${groupTitles[groupName] || groupName}</div>`;
+            
+            if (groupName === 'location') {
+              cardHTML += buildLocationSection(groups[groupName]);
+            } else if (groupName === 'evidence') {
+              cardHTML += buildEvidenceSection(groups[groupName]);
+            } else {
+              cardHTML += buildFieldsSection(groups[groupName]);
+            }
+            
+            card.innerHTML = cardHTML;
+            container.appendChild(card);
+          });
+          
+        } catch (e) {
+          console.error('Failed to load form config:', e);
+          // Fallback to default form
+          buildDefaultForm();
+        }
+      }
+      
+      function buildFieldsSection(fields) {
+        return fields.map(field => buildFieldHTML(field)).join('');
+      }
+      
+      function buildFieldHTML(field) {
+        const required = field.isRequired ? '<span class="required">*</span>' : '';
+        const reqAttr = field.isRequired ? 'required' : '';
+        const helpText = field.helpText ? `<small style="color:#6b7280;display:block;margin-top:4px;">${field.helpText}</small>` : '';
+        
+        switch (field.fieldType) {
+          case 'text':
+          case 'phone':
+          case 'email':
+            const inputType = field.fieldType === 'phone' ? 'tel' : field.fieldType === 'email' ? 'email' : 'text';
+            return `<div class="form-group">
+              <label class="form-label">${field.fieldLabel} ${required}</label>
+              <input type="${inputType}" class="form-input" id="${field.fieldName}" ${reqAttr} placeholder="${field.helpText || ''}">
+            </div>`;
+            
+          case 'textarea':
+            return `<div class="form-group">
+              <label class="form-label">${field.fieldLabel} ${required}</label>
+              <textarea class="form-textarea" id="${field.fieldName}" ${reqAttr} placeholder="${field.helpText || ''}"></textarea>
+            </div>`;
+            
+          case 'dropdown':
+            const options = (field.dropdownOptions || []).map(opt => 
+              `<option value="${opt.value}">${opt.label}</option>`
+            ).join('');
+            return `<div class="form-group">
+              <label class="form-label">${field.fieldLabel} ${required}</label>
+              <select class="form-select" id="${field.fieldName}" ${reqAttr}>
+                <option value="">Select...</option>
+                ${options}
+              </select>
+            </div>`;
+            
+          default:
+            return '';
+        }
+      }
+      
+      function buildLocationSection(fields) {
+        const addressField = fields.find(f => f.fieldName === 'establishment_address');
+        const addressLabel = addressField ? addressField.fieldLabel : 'Address / Landmark';
+        const addressRequired = addressField && addressField.isRequired;
+        
+        return `
+          <button type="button" class="location-btn" id="locationBtn" onclick="getLocation()">
+            <svg viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+            <span id="locationBtnText">Capture Current Location</span>
+          </button>
+          <div id="locationInfo" class="location-info hidden">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            <span id="locationText">Location captured</span>
+          </div>
+          <input type="hidden" id="latitude">
+          <input type="hidden" id="longitude">
+          <input type="hidden" id="accuracy">
+          <div class="form-group" style="margin-top: 16px;">
+            <label class="form-label">${addressLabel} ${addressRequired ? '<span class="required">*</span>' : ''}</label>
+            <textarea class="form-textarea" id="address" placeholder="Enter the location address or nearby landmark" style="min-height: 60px;" ${addressRequired ? 'required' : ''}></textarea>
+          </div>
+        `;
+      }
+      
+      function buildEvidenceSection(fields) {
+        const evidenceField = fields.find(f => f.fieldType === 'file');
+        if (!evidenceField) return '';
+        
+        const rules = evidenceField.validationRules || {};
+        maxFilesAllowed = rules.maxFiles || 3;
+        const maxSizeMB = rules.maxSizeMB || 5;
+        const watermarkEnabled = rules.watermark?.enabled !== false;
+        
+        const required = evidenceField.isRequired ? '<span class="required">*</span>' : '';
+        const noteText = `Upload up to ${maxFilesAllowed} photos as evidence${watermarkEnabled ? ' (watermark will be added)' : ''}. Max ${maxSizeMB}MB each.`;
+        
+        return `
+          <p class="evidence-note">${noteText}</p>
+          <div class="file-input-wrapper">
+            <div class="file-input">
+              <input type="file" id="evidenceFiles" accept="image/*" multiple onchange="handleFileSelect(event)">
+              <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+              <p>Click or drag photos here</p>
+            </div>
+          </div>
+          <div id="filePreview" class="file-preview"></div>
+        `;
+      }
+      
+      function buildDefaultForm() {
+        document.getElementById('dynamicFormFields').innerHTML = `
+          <div class="card">
+            <div class="card-title">${groupIcons.complainant}Your Details</div>
+            <div class="form-group">
+              <label class="form-label">Full Name <span class="required">*</span></label>
+              <input type="text" class="form-input" id="complainant_name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mobile Number <span class="required">*</span></label>
+              <input type="tel" class="form-input" id="complainant_mobile" required>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">${groupIcons.incident}Incident Details</div>
+            <div class="form-group">
+              <label class="form-label">Complaint Type <span class="required">*</span></label>
+              <select class="form-select" id="complaint_type" required>
+                <option value="">Select...</option>
+                <option value="Food Safety">Food Safety</option>
+                <option value="Hygiene Violation">Hygiene Violation</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Description <span class="required">*</span></label>
+              <textarea class="form-textarea" id="incident_description" required></textarea>
+            </div>
+          </div>
+        `;
+      }
+
+      function showInvalidLink(message) {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('invalidLinkMessage').textContent = message;
+        document.getElementById('invalidLinkState').classList.remove('hidden');
+      }
+
+      function showForm() {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('formState').classList.remove('hidden');
+      }
+
+      function showError(message) {
+        const errorEl = document.getElementById('errorMessage');
+        errorEl.textContent = message;
+        errorEl.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function hideError() {
+        document.getElementById('errorMessage').classList.add('hidden');
+      }
+
+      function getLocation() {
+        const btn = document.getElementById('locationBtn');
+        const btnText = document.getElementById('locationBtnText');
+        
+        btn.disabled = true;
+        btnText.textContent = 'Getting location...';
+
+        if (!navigator.geolocation) {
+          showError('Geolocation is not supported by your browser');
+          btn.disabled = false;
+          btnText.textContent = 'Capture Current Location';
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            document.getElementById('latitude').value = position.coords.latitude;
+            document.getElementById('longitude').value = position.coords.longitude;
+            document.getElementById('accuracy').value = position.coords.accuracy;
+            
+            document.getElementById('locationInfo').classList.remove('hidden');
+            document.getElementById('locationText').textContent = 
+              `Location captured: ${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
+            
+            btn.disabled = false;
+            btnText.textContent = 'Update Location';
+          },
+          (error) => {
+            let msg = 'Failed to get location';
+            if (error.code === 1) msg = 'Location permission denied';
+            else if (error.code === 2) msg = 'Location unavailable';
+            else if (error.code === 3) msg = 'Location request timed out';
+            
+            showError(msg);
+            btn.disabled = false;
+            btnText.textContent = 'Capture Current Location';
+          },
+          { enableHighAccuracy: true, timeout: 10000 }
+        );
+      }
+
+      function handleFileSelect(event) {
+        const files = Array.from(event.target.files);
+        if (files.length + selectedFiles.length > maxFilesAllowed) {
+          showError(`Maximum ${maxFilesAllowed} photos allowed`);
+          return;
+        }
+        
+        selectedFiles = [...selectedFiles, ...files].slice(0, maxFilesAllowed);
+        renderFilePreviews();
+      }
+
+      function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        renderFilePreviews();
+      }
+
+      function renderFilePreviews() {
+        const preview = document.getElementById('filePreview');
+        preview.innerHTML = selectedFiles.map((file, i) => `
+          <div class="file-preview-item">
+            <img src="${URL.createObjectURL(file)}" alt="Evidence ${i + 1}">
+            <button type="button" class="file-preview-remove" onclick="removeFile(${i})">x</button>
+          </div>
+        `).join('');
+      }
+
+      function getFieldValue(fieldName) {
+        const el = document.getElementById(fieldName);
+        return el ? (el.value || '').trim() : '';
+      }
+      
+      document.getElementById('complaintForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideError();
+
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
+        try {
+          const latitude = document.getElementById('latitude')?.value;
+          const longitude = document.getElementById('longitude')?.value;
+          const addressEl = document.getElementById('address') || document.getElementById('establishment_address');
+          const addressValue = addressEl ? addressEl.value.trim() : '';
+          
+          const payload = {
+            sharedLinkToken: sharedLinkData?.token,
+            districtId: sharedLinkData?.districtId,
+            complainantName: getFieldValue('complainant_name'),
+            complainantMobile: getFieldValue('complainant_mobile'),
+            complainantEmail: getFieldValue('complainant_email') || undefined,
+            complaintType: getFieldValue('complaint_type'),
+            complaintNature: getFieldValue('complaint_nature'),
+            establishmentName: getFieldValue('establishment_name'),
+            incidentDescription: getFieldValue('incident_description'),
+            location: latitude ? {
+              latitude: latitude,
+              longitude: longitude,
+              accuracy: document.getElementById('accuracy')?.value || '0',
+              source: 'gps',
+              address: addressValue
+            } : {
+              latitude: '0',
+              longitude: '0',
+              source: 'manual',
+              address: addressValue
+            },
+            submittedVia: 'web'
+          };
+
+          const res = await fetch('/api/complaints/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || 'Failed to submit complaint');
+          }
+
+          document.getElementById('complaintCode').textContent = data.complaintCode || data.id;
+          document.getElementById('formState').classList.add('hidden');
+          document.getElementById('successState').classList.remove('hidden');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        } catch (error) {
+          showError(error.message);
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Complaint';
+        }
+      });
+
+      init();
+    </script>
+  </body>
+</html>
