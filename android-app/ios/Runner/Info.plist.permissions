@@ -1,0 +1,23 @@
+<!-- Add these keys to your Info.plist for iOS permissions -->
+
+<!-- Camera -->
+<key>NSCameraUsageDescription</key>
+<string>This app requires camera access to capture inspection photos and evidence.</string>
+
+<!-- Photo Library -->
+<key>NSPhotoLibraryUsageDescription</key>
+<string>This app requires photo library access to select evidence photos.</string>
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>This app requires photo library access to save inspection photos.</string>
+
+<!-- Location -->
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>This app requires location access to geo-tag inspections and complaints.</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>This app requires location access for accurate inspection records.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>This app requires background location for tour diary tracking.</string>
+
+<!-- Face ID (for secure storage) -->
+<key>NSFaceIDUsageDescription</key>
+<string>This app uses Face ID to protect sensitive inspection data.</string>
