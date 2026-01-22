@@ -1,0 +1,17 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - avoid_print
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_final_fields
+    - prefer_final_locals
+    - unnecessary_this
+    - avoid_empty_else
+    - cancel_subscriptions
+    - close_sinks
+    - hash_and_equals
+    - no_duplicate_case_values
+    - prefer_is_empty
+    - prefer_is_not_empty
