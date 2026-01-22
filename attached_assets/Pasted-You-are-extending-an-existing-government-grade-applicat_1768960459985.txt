@@ -1,0 +1,189 @@
+You are extending an existing government-grade application by enhancing
+the COMPLAINT MANAGEMENT module.
+
+The Complaint Form must automatically capture location data, support
+evidence uploads, and remain fully dynamic and admin-controlled.
+No field, rule, or workflow must be hard-coded.
+
+------------------------------------------------
+CORE PRINCIPLE
+------------------------------------------------
+
+Complaint submission must be:
+- Simple for citizens
+- Location-accurate
+- Evidence-supported
+- Jurisdiction-aware
+- Fully auditable
+
+All complaint form fields, validations, and visibility rules must be
+controlled from the Super Admin panel using a dynamic form builder.
+
+------------------------------------------------
+AUTOMATIC LOCATION CAPTURE
+------------------------------------------------
+
+When the complainant opens the complaint link:
+
+1. The system must automatically:
+   - Request device location permission
+   - Capture current latitude and longitude
+   - Capture location accuracy and timestamp
+
+2. The captured data must include:
+   - Latitude
+   - Longitude
+   - Location accuracy (meters)
+   - Capture time
+
+3. The location data must:
+   - Auto-fill the Incident Location section
+   - Be editable only if admin allows manual override
+   - Be stored immutably for audit purposes
+
+If permission is denied:
+- Allow manual location entry
+- Mark location source as "Manual"
+
+------------------------------------------------
+COMPLAINT FORM FIELDS (DYNAMIC)
+------------------------------------------------
+
+Super Admin must be able to configure the complaint form fields.
+Typical fields may include (examples only):
+
+Complainant Details:
+- Complainant Name
+- Mobile Number (OTP optional)
+- Alternate Mobile Number (optional)
+- Email (optional)
+
+Incident Details:
+- Incident Date & Time
+- Incident Location (auto-filled using GPS)
+- Latitude & Longitude (read-only by default)
+- Nearby Landmark
+- Jurisdiction (auto-mapped from coordinates)
+- Description of Complaint
+
+Other Person / Accused Details (Optional):
+- Name (if known)
+- Mobile Number (if known)
+- Relationship / Role (dropdown)
+
+------------------------------------------------
+PROOF & EVIDENCE UPLOAD
+------------------------------------------------
+
+The complaint form must support evidence uploads:
+
+- Photos (camera or gallery)
+- Videos (optional)
+- Audio (optional)
+- Documents (optional)
+
+Rules:
+- Multiple uploads allowed
+- File size & type configurable by Super Admin
+- Each upload must store:
+  - File type
+  - Upload timestamp
+  - GPS metadata (if available)
+
+------------------------------------------------
+MOBILE & CONTACT VALIDATION
+------------------------------------------------
+
+- Primary mobile number must be validated (OTP optional, admin-controlled)
+- Alternate mobile numbers allowed
+- Mobile numbers must be masked where required
+- Used for status updates if notifications are enabled later
+
+------------------------------------------------
+POST-SUBMISSION BEHAVIOR
+------------------------------------------------
+
+After complaint submission:
+- A unique complaint code is generated
+- Complaint status is set to initial admin-configured state
+- Jurisdiction is auto-assigned based on GPS/location
+- Complaint becomes visible to officers assigned to that jurisdiction
+
+------------------------------------------------
+OFFICER VIEW & ACTIONS
+------------------------------------------------
+
+Officers must see:
+- Complaint location on map (if enabled)
+- Latitude & longitude
+- Uploaded proofs
+- Contact details (as permitted)
+
+Officers can:
+- Upload additional photos during field visit
+- Update action taken with geo-tagged evidence
+- Change complaint status using allowed transitions
+
+------------------------------------------------
+COMPLAINANT STATUS TRACKING
+------------------------------------------------
+
+Using complaint code, complainant can view:
+- Current status
+- Status history
+- Officer action remarks (if enabled)
+- Uploaded evidence (if permitted)
+
+No internal notes or officer identities unless admin allows.
+
+------------------------------------------------
+ADMIN CONTROL & CONFIGURATION
+------------------------------------------------
+
+Super Admin must be able to configure:
+- Which fields are mandatory
+- Which fields are visible to complainant
+- Which fields are visible to officers
+- GPS capture enforcement
+- Manual location override
+- Evidence limits & formats
+- Status workflows & transitions
+
+------------------------------------------------
+DATA & AUDIT RULES
+------------------------------------------------
+
+- Location data must be immutable once submitted
+- All uploads must be traceable
+- Complaint history must never be deleted
+- Jurisdiction must be stored as per submission time
+- GPS vs manual entry must be recorded
+
+------------------------------------------------
+SECURITY & PRIVACY
+------------------------------------------------
+
+- Location data accessible only to authorised roles
+- Personal data masked where required
+- Secure file storage for proofs
+- Public users cannot modify complaints after submission
+
+------------------------------------------------
+FINAL INSTRUCTION
+------------------------------------------------
+
+Implement the enhanced Complaint Form as a dynamic, location-aware,
+evidence-supported, admin-controlled system.
+
+Do NOT hard-code:
+- Form fields
+- Location rules
+- Validation logic
+- Workflow steps
+
+Assume the system will be:
+- Used at large government scale
+- Maintained by other AI systems
+- Audited for legal compliance
+
+Clarity, correctness, and audit safety are mandatory.
