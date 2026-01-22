@@ -1,0 +1,245 @@
+You are extending an existing government-grade Food Safety Inspection system.
+
+Add a new module called:
+INSTITUTIONAL FOOD SAFETY INSPECTION
+
+This module is specifically for inspecting Government and Institutional
+food service establishments, including but not limited to:
+- Mid Day Meal Schools
+- KGBV Schools
+- Residential Schools
+- Hostels (School / College)
+- Government Hospitals
+- College Hostels
+- Government Canteens
+- Government Temples
+- Other Government Institutions
+
+The module must be:
+- Risk-based
+- Indicator-driven
+- Weighted scoring based
+- Fully dynamic and admin-controlled
+- Aligned with FSSAI norms and Indian institutional food safety practices
+
+------------------------------------------------
+CORE DESIGN PRINCIPLES
+------------------------------------------------
+
+- This is NOT a commercial FBO inspection.
+- Focus is on public health, children, patients, and vulnerable groups.
+- Surveillance samples only (no enforcement by default).
+- Scoring must classify institutions into:
+  - High Risk
+  - Medium Risk
+  - Low Risk
+
+No indicator, weight, category, or threshold must be hard-coded.
+
+------------------------------------------------
+INSTITUTIONAL DETAILS (DYNAMIC FORM)
+------------------------------------------------
+
+Inspection must capture:
+
+Institution Details:
+- Institution Type (dynamic list)
+- Institution Name
+- Address
+- District / Jurisdiction
+- GPS Location (latitude, longitude)
+- Inspection Date & Time
+
+Responsible Persons:
+- Head of Institution
+  - Name
+  - S/o / D/o
+  - Age
+  - Mobile Number
+- Incharge / Warden
+  - Name
+  - S/o / D/o
+  - Age
+  - Mobile Number
+- Contractor / Cook / Service Provider
+  - Name
+  - Mobile Number
+  - FSSAI License / Registration Number (if applicable)
+
+------------------------------------------------
+SURVEILLANCE SAMPLE COLLECTION
+------------------------------------------------
+
+Only Surveillance Samples allowed.
+
+Capture:
+- Sample Name
+- Sample Code
+- Place of Collection
+- Packed / Loose
+- Date & Time of Collection
+- Witness Name
+- Witness Address
+- Witness Mobile
+- Sample Photo(s)
+
+------------------------------------------------
+PHOTOGRAPHS & LOCATION
+------------------------------------------------
+
+- Mandatory geo-tagged photographs
+- Automatic watermark on images containing:
+  - Department Name
+  - Date & Time
+  - Latitude & Longitude
+  - Institution Name
+  - Inspection Type
+- Same watermark style as Complaint module
+- Photos include:
+  - Kitchen
+  - Storage
+  - Cooking area
+  - Serving area
+  - Water source
+  - Waste disposal
+
+------------------------------------------------
+RISK ASSESSMENT FRAMEWORK (CORE FEATURE)
+------------------------------------------------
+
+Inspection must use a structured framework of:
+
+- 7 Pillars
+- 35 Indicators (total)
+
+Indicators are divided into:
+- High Risk Indicators (Weight = 3)
+- Medium Risk Indicators (Weight = 2)
+- Low Risk Indicators (Weight = 1)
+
+Each indicator:
+- Is Yes / No / Not Applicable
+- Contributes weighted score if non-compliant
+
+------------------------------------------------
+7 PILLARS & 35 INDICATORS (FSSAI-ALIGNED)
+------------------------------------------------
+
+PILLAR 1: FOOD PROCUREMENT & SUPPLY (5 Indicators)
+1. Approved and safe raw material sources (High – 3)
+2. Freshness of raw materials (High – 3)
+3. No use of expired / damaged food (High – 3)
+4. Proper vendor records (Medium – 2)
+5. Safe water used for food preparation (High – 3)
+
+PILLAR 2: STORAGE & TEMPERATURE CONTROL (5 Indicators)
+6. Dry storage cleanliness (Medium – 2)
+7. Separation of raw & cooked food (High – 3)
+8. Adequate refrigeration (High – 3)
+9. Proper labeling & FIFO followed (Medium – 2)
+10. Pest-free storage area (High – 3)
+
+PILLAR 3: FOOD PREPARATION & COOKING (5 Indicators)
+11. Proper cooking temperatures achieved (High – 3)
+12. Cross-contamination prevention (High – 3)
+13. Clean utensils & equipment (Medium – 2)
+14. Use of potable water for cooking (High – 3)
+15. Safe reheating practices (Medium – 2)
+
+PILLAR 4: PERSONAL HYGIENE & HEALTH (5 Indicators)
+16. Food handlers medically examined (High – 3)
+17. Use of clean protective clothing (Medium – 2)
+18. Handwashing facilities available (High – 3)
+19. No ill person handling food (High – 3)
+20. Personal hygiene awareness (Low – 1)
+
+PILLAR 5: CLEANLINESS & SANITATION (5 Indicators)
+21. Clean kitchen environment (Medium – 2)
+22. Safe waste disposal system (Medium – 2)
+23. Clean water source maintained (High – 3)
+24. Regular cleaning schedule followed (Low – 1)
+25. No accumulation of waste (Medium – 2)
+
+PILLAR 6: SERVING & DISTRIBUTION (5 Indicators)
+26. Hygienic serving practices (High – 3)
+27. Clean serving utensils (Medium – 2)
+28. Protection from environmental contamination (Medium – 2)
+29. Safe transportation of food (Medium – 2)
+30. Timely consumption after preparation (High – 3)
+
+PILLAR 7: MANAGEMENT & AWARENESS (5 Indicators)
+31. Food safety training conducted (Low – 1)
+32. Display of hygiene instructions (Low – 1)
+33. Record keeping & monitoring (Medium – 2)
+34. Emergency food safety response readiness (Medium – 2)
+35. Overall food safety supervision (High – 3)
+
+------------------------------------------------
+SCORING & RISK CLASSIFICATION
+------------------------------------------------
+
+Rules:
+- Each non-compliant indicator adds its weight to risk score
+- High Risk indicators have priority impact
+
+Risk Classification (Admin configurable):
+- Low Risk: Total weighted score ≤ X
+- Medium Risk: X < score ≤ Y
+- High Risk: score > Y
+
+Special Rule:
+If High Risk indicator non-compliance count exceeds a defined threshold,
+institution must be classified as HIGH RISK irrespective of total score.
+
+------------------------------------------------
+INSPECTION OUTCOME
+------------------------------------------------
+
+Inspection must generate:
+- Institutional Inspection Report (PDF)
+- Risk Category (Low / Medium / High)
+- List of deviations
+- Recommendations
+- Surveillance sample details
+
+------------------------------------------------
+ADMIN CONTROL & CONFIGURATION
+------------------------------------------------
+
+Super Admin must be able to:
+- Modify indicators
+- Change weights
+- Add/remove indicators
+- Adjust risk thresholds
+- Enable/disable pillars
+- Version the inspection form
+
+------------------------------------------------
+DATA & AUDIT RULES
+------------------------------------------------
+
+- Inspection data is immutable after submission
+- Scores must be reproducible from stored responses
+- Historical indicators & weights must be preserved for audit
+- Photos and samples must remain linked permanently
+
+------------------------------------------------
+FINAL INSTRUCTION
+------------------------------------------------
+
+Implement Institutional Inspection as a fully dynamic,
+risk-based, FSSAI-aligned module.
+
+Do NOT hard-code:
+- Indicators
+- Weights
+- Thresholds
+- Institution types
+
+Assume:
+- Large-scale government usage
+- Child and patient safety priority
+- Long-term audits and legal review
+- Maintenance by other AI systems
+
+Clarity, correctness, and public health safety are mandatory.
