@@ -1,0 +1,120 @@
+------------------------------------------------------------------
+JURISDICTION & ADMINISTRATIVE HIERARCHY MANAGEMENT
+------------------------------------------------------------------
+
+Build a robust, fully dynamic jurisdiction management system controlled entirely by the Super Admin. Jurisdictions must support configurable administrative hierarchy levels, parent–child relationships, and time-bound officer assignments with role and capacity. No jurisdiction level or structure must be hard-coded.
+
+------------------------------------------------------------------
+ADMINISTRATIVE LEVELS (DYNAMIC)
+------------------------------------------------------------------
+Super Admin must be able to define and manage administrative hierarchy levels.
+
+Each level must have:
+- Level Number (e.g., 0, 1, 2, 3…)
+- Level Name (e.g., State, Municipal Corporation, Zone, District, Circle, Division, Mandal)
+- Display Order
+- Active / Inactive status
+
+Example configuration (dynamic, editable):
+- Level 0: State
+- Level 1: Municipal Corporation
+- Level 2: Zone
+- Level 3: District / Circle
+- Level 4: Division
+- Level 5: Mandal
+
+Super Admin must be able to:
+- Add new levels
+- Rename levels
+- Disable levels
+- Reorder levels
+without any code changes.
+
+------------------------------------------------------------------
+JURISDICTION UNITS (HIERARCHICAL)
+------------------------------------------------------------------
+Under each administrative level, Super Admin must be able to create jurisdiction units.
+
+Each jurisdiction unit must have:
+- Name
+- Code (official reference)
+- Administrative Level
+- Parent Jurisdiction (self-referencing hierarchy)
+- Active / Inactive status
+
+Examples:
+- State → Telangana
+- District → Hyderabad
+- Mandal → Kukatpally
+- Zone → North Zone
+
+The system must support:
+- Unlimited hierarchy depth
+- Parent–child traversal
+- Tree-based jurisdiction structure
+- Deactivation without data loss
+
+------------------------------------------------------------------
+OFFICER ASSIGNMENT TO JURISDICTIONS
+------------------------------------------------------------------
+Officers must be assignable to one or more jurisdiction units using a mapping system.
+
+Each officer–jurisdiction assignment must include:
+- Officer
+- Jurisdiction Unit
+- Role (FSO, DO, FAC, Inspector, etc. – Super Admin controlled)
+- Capacity (Regular, In-Charge, FAC, Temporary – Super Admin controlled)
+- Start Date
+- End Date (optional)
+- Active / Inactive status
+
+Assignments must be:
+- Time-bound
+- Historically preserved for audit
+- Non-destructive (no overwriting past assignments)
+
+------------------------------------------------------------------
+ASSIGNMENT RULES & ACCESS CONTROL
+------------------------------------------------------------------
+- An officer may have multiple jurisdiction assignments
+- An officer may have different roles or capacities in different jurisdictions
+- One primary active jurisdiction must be selectable per login session
+- Officers may switch jurisdiction context only if assigned
+- All inspections, samples, reports, and documents must be strictly jurisdiction-scoped
+
+------------------------------------------------------------------
+SUPER ADMIN DASHBOARD – JURISDICTION MODULE
+------------------------------------------------------------------
+Super Admin interface must provide:
+- Administrative Levels Management
+- Jurisdiction Units Management (tree view)
+- Officer Assignment Management
+- Assignment History & Audit Log
+- Bulk Import (Excel/CSV) for jurisdictions and assignments
+
+The UI should support:
+- Expand / collapse hierarchy tree
+- Search by jurisdiction name or code
+- Safe deactivation of units
+- Clear visualization of officer coverage
+
+------------------------------------------------------------------
+DATA INTEGRITY & AUDIT REQUIREMENTS
+------------------------------------------------------------------
+- Jurisdiction changes must not affect historical inspections or documents
+- All jurisdiction assignments must be logged with timestamps
+- Past jurisdiction structures must remain readable for audit and court use
+- All generated documents must reference the jurisdiction valid at the time of action
+
+------------------------------------------------------------------
+INTEGRATION REQUIREMENTS
+------------------------------------------------------------------
+The jurisdiction system must integrate with:
+- Inspection creation
+- Sample management
+- Workflow rules
+- Document generation
+- Dashboards and reports
+
+All reports must support aggregation at any jurisdiction level
+(State → District → Mandal, etc.).
