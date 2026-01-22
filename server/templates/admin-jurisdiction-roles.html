@@ -1,0 +1,446 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Roles & Capacities - Food Safety Inspector</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f3f4f6; min-height: 100vh; }
+      .header { background: #1E40AF; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+      .header-left { display: flex; align-items: center; gap: 12px; }
+      .header-logo { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+      .header-logo svg { width: 24px; height: 24px; fill: white; }
+      .header-title { font-size: 18px; font-weight: 600; }
+      .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; text-decoration: none; }
+      .back-btn:hover { background: rgba(255,255,255,0.2); }
+      .main { padding: 24px; max-width: 1200px; margin: 0 auto; }
+      .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+      .tab { padding: 12px 24px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; color: #6b7280; }
+      .tab.active { background: #1E40AF; color: white; border-color: #1E40AF; }
+      .tab:hover:not(.active) { background: #f9fafb; }
+      .section { display: none; }
+      .section.active { display: block; }
+      .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+      .page-title { font-size: 24px; font-weight: 700; color: #1f2937; }
+      .add-btn { background: #1E40AF; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+      .add-btn:hover { background: #1e3a8a; }
+      .add-btn svg { width: 20px; height: 20px; fill: white; }
+      .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+      table { width: 100%; border-collapse: collapse; }
+      th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; }
+      td { padding: 16px; border-bottom: 1px solid #e5e7eb; font-size: 14px; color: #1f2937; }
+      tr:last-child td { border-bottom: none; }
+      tr:hover { background: #f9fafb; }
+      .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+      .status-active { background: #d1fae5; color: #059669; }
+      .status-inactive { background: #fee2e2; color: #dc2626; }
+      .action-btns { display: flex; gap: 8px; }
+      .action-btn { padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; border: none; }
+      .edit-btn { background: #eff6ff; color: #1E40AF; }
+      .edit-btn:hover { background: #dbeafe; }
+      .delete-btn { background: #fef2f2; color: #dc2626; }
+      .delete-btn:hover { background: #fee2e2; }
+      .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+      .modal.show { display: flex; }
+      .modal-content { background: white; border-radius: 12px; padding: 24px; width: 100%; max-width: 500px; }
+      .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #1f2937; }
+      .form-group { margin-bottom: 16px; }
+      .form-label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+      .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; }
+      .form-textarea { min-height: 80px; resize: vertical; font-family: inherit; }
+      .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #1E40AF; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+      .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+      .cancel-btn { padding: 10px 20px; border: 1px solid #d1d5db; background: white; border-radius: 8px; font-size: 14px; cursor: pointer; }
+      .cancel-btn:hover { background: #f9fafb; }
+      .save-btn { padding: 10px 20px; background: #1E40AF; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+      .save-btn:hover { background: #1e3a8a; }
+      .empty-state { padding: 60px 20px; text-align: center; color: #6b7280; }
+      .empty-state svg { width: 64px; height: 64px; fill: #d1d5db; margin-bottom: 16px; }
+      .empty-state h3 { font-size: 18px; color: #374151; margin-bottom: 8px; }
+      .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+      .info-box p { color: #1e40af; font-size: 14px; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-left">
+        <div class="header-logo">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        </div>
+        <div class="header-title">Roles & Capacities</div>
+      </div>
+      <a href="/admin/jurisdiction" class="back-btn">Back to Jurisdiction</a>
+    </header>
+
+    <main class="main">
+      <div class="info-box">
+        <p><strong>Roles</strong> define officer positions (FSO, DO, FAC, Inspector). <strong>Capacities</strong> define assignment types (Regular, In-Charge, Temporary, FAC). Both are used when assigning officers to jurisdictions.</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('roles')">Officer Roles</button>
+        <button class="tab" onclick="switchTab('capacities')">Assignment Capacities</button>
+      </div>
+
+      <div id="roles-section" class="section active">
+        <div class="page-header">
+          <h1 class="page-title">Officer Roles</h1>
+          <button class="add-btn" onclick="openRoleModal()">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Add Role
+          </button>
+        </div>
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Order</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="roles-table"></tbody>
+          </table>
+          <div class="empty-state" id="roles-empty" style="display: none;">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <h3>No Roles Defined</h3>
+            <p>Click "Add Role" to define officer roles like FSO, DO, FAC</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="capacities-section" class="section">
+        <div class="page-header">
+          <h1 class="page-title">Assignment Capacities</h1>
+          <button class="add-btn" onclick="openCapacityModal()">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Add Capacity
+          </button>
+        </div>
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Order</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="capacities-table"></tbody>
+          </table>
+          <div class="empty-state" id="capacities-empty" style="display: none;">
+            <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/></svg>
+            <h3>No Capacities Defined</h3>
+            <p>Click "Add Capacity" to define capacity types like Regular, In-Charge, Temporary</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal" id="role-modal">
+      <div class="modal-content">
+        <h2 class="modal-title" id="role-modal-title">Add Role</h2>
+        <form id="role-form">
+          <input type="hidden" id="role-id" />
+          <div class="form-group">
+            <label class="form-label">Role Name *</label>
+            <input type="text" class="form-input" id="role-name" required placeholder="e.g., FSO, DO, FAC, Inspector" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="role-description" placeholder="Brief description of this role"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Display Order</label>
+            <input type="number" class="form-input" id="role-displayOrder" min="0" value="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="role-status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" onclick="closeRoleModal()">Cancel</button>
+            <button type="submit" class="save-btn">Save Role</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" id="capacity-modal">
+      <div class="modal-content">
+        <h2 class="modal-title" id="capacity-modal-title">Add Capacity</h2>
+        <form id="capacity-form">
+          <input type="hidden" id="capacity-id" />
+          <div class="form-group">
+            <label class="form-label">Capacity Name *</label>
+            <input type="text" class="form-input" id="capacity-name" required placeholder="e.g., Regular, In-Charge, Temporary, FAC" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="capacity-description" placeholder="Brief description of this capacity"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Display Order</label>
+            <input type="number" class="form-input" id="capacity-displayOrder" min="0" value="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="capacity-status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" onclick="closeCapacityModal()">Cancel</button>
+            <button type="submit" class="save-btn">Save Capacity</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let roles = [];
+      let capacities = [];
+      let editingRoleId = null;
+      let editingCapacityId = null;
+
+      function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelector(`.tab:${tab === 'roles' ? 'first-child' : 'last-child'}`).classList.add('active');
+        document.getElementById(`${tab}-section`).classList.add('active');
+      }
+
+      async function loadData() {
+        try {
+          const [rolesRes, capacitiesRes] = await Promise.all([
+            fetch('/api/admin/roles'),
+            fetch('/api/admin/capacities')
+          ]);
+          roles = await rolesRes.json();
+          capacities = await capacitiesRes.json();
+          renderRolesTable();
+          renderCapacitiesTable();
+        } catch (error) {
+          console.error('Failed to load data:', error);
+        }
+      }
+
+      function renderRolesTable() {
+        const tbody = document.getElementById('roles-table');
+        const emptyState = document.getElementById('roles-empty');
+        
+        if (roles.length === 0) {
+          tbody.innerHTML = '';
+          emptyState.style.display = 'block';
+          return;
+        }
+        
+        emptyState.style.display = 'none';
+        tbody.innerHTML = roles.map(role => `
+          <tr>
+            <td><strong>${role.name}</strong></td>
+            <td>${role.description || '-'}</td>
+            <td>${role.displayOrder}</td>
+            <td><span class="status-badge status-${role.status}">${role.status}</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn edit-btn" onclick="editRole('${role.id}')">Edit</button>
+                <button class="action-btn delete-btn" onclick="deleteRole('${role.id}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      function renderCapacitiesTable() {
+        const tbody = document.getElementById('capacities-table');
+        const emptyState = document.getElementById('capacities-empty');
+        
+        if (capacities.length === 0) {
+          tbody.innerHTML = '';
+          emptyState.style.display = 'block';
+          return;
+        }
+        
+        emptyState.style.display = 'none';
+        tbody.innerHTML = capacities.map(capacity => `
+          <tr>
+            <td><strong>${capacity.name}</strong></td>
+            <td>${capacity.description || '-'}</td>
+            <td>${capacity.displayOrder}</td>
+            <td><span class="status-badge status-${capacity.status}">${capacity.status}</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn edit-btn" onclick="editCapacity('${capacity.id}')">Edit</button>
+                <button class="action-btn delete-btn" onclick="deleteCapacity('${capacity.id}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      function openRoleModal(role = null) {
+        const modal = document.getElementById('role-modal');
+        const title = document.getElementById('role-modal-title');
+        const form = document.getElementById('role-form');
+        
+        if (role) {
+          title.textContent = 'Edit Role';
+          document.getElementById('role-id').value = role.id;
+          document.getElementById('role-name').value = role.name;
+          document.getElementById('role-description').value = role.description || '';
+          document.getElementById('role-displayOrder').value = role.displayOrder;
+          document.getElementById('role-status').value = role.status;
+          editingRoleId = role.id;
+        } else {
+          title.textContent = 'Add Role';
+          form.reset();
+          document.getElementById('role-id').value = '';
+          document.getElementById('role-displayOrder').value = roles.length;
+          editingRoleId = null;
+        }
+        
+        modal.classList.add('show');
+      }
+
+      function closeRoleModal() {
+        document.getElementById('role-modal').classList.remove('show');
+        editingRoleId = null;
+      }
+
+      function editRole(id) {
+        const role = roles.find(r => r.id === id);
+        if (role) openRoleModal(role);
+      }
+
+      async function deleteRole(id) {
+        if (!confirm('Are you sure you want to delete this role?')) return;
+        try {
+          await fetch(`/api/admin/roles/${id}`, { method: 'DELETE' });
+          loadData();
+        } catch (error) {
+          alert('Failed to delete role');
+        }
+      }
+
+      document.getElementById('role-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const data = {
+          name: document.getElementById('role-name').value,
+          description: document.getElementById('role-description').value,
+          displayOrder: parseInt(document.getElementById('role-displayOrder').value),
+          status: document.getElementById('role-status').value,
+        };
+
+        try {
+          const url = editingRoleId ? `/api/admin/roles/${editingRoleId}` : '/api/admin/roles';
+          const method = editingRoleId ? 'PUT' : 'POST';
+          
+          const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            closeRoleModal();
+            loadData();
+          } else {
+            const error = await response.json();
+            alert(error.error || 'Failed to save role');
+          }
+        } catch (error) {
+          alert('Failed to save role');
+        }
+      });
+
+      function openCapacityModal(capacity = null) {
+        const modal = document.getElementById('capacity-modal');
+        const title = document.getElementById('capacity-modal-title');
+        const form = document.getElementById('capacity-form');
+        
+        if (capacity) {
+          title.textContent = 'Edit Capacity';
+          document.getElementById('capacity-id').value = capacity.id;
+          document.getElementById('capacity-name').value = capacity.name;
+          document.getElementById('capacity-description').value = capacity.description || '';
+          document.getElementById('capacity-displayOrder').value = capacity.displayOrder;
+          document.getElementById('capacity-status').value = capacity.status;
+          editingCapacityId = capacity.id;
+        } else {
+          title.textContent = 'Add Capacity';
+          form.reset();
+          document.getElementById('capacity-id').value = '';
+          document.getElementById('capacity-displayOrder').value = capacities.length;
+          editingCapacityId = null;
+        }
+        
+        modal.classList.add('show');
+      }
+
+      function closeCapacityModal() {
+        document.getElementById('capacity-modal').classList.remove('show');
+        editingCapacityId = null;
+      }
+
+      function editCapacity(id) {
+        const capacity = capacities.find(c => c.id === id);
+        if (capacity) openCapacityModal(capacity);
+      }
+
+      async function deleteCapacity(id) {
+        if (!confirm('Are you sure you want to delete this capacity?')) return;
+        try {
+          await fetch(`/api/admin/capacities/${id}`, { method: 'DELETE' });
+          loadData();
+        } catch (error) {
+          alert('Failed to delete capacity');
+        }
+      }
+
+      document.getElementById('capacity-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const data = {
+          name: document.getElementById('capacity-name').value,
+          description: document.getElementById('capacity-description').value,
+          displayOrder: parseInt(document.getElementById('capacity-displayOrder').value),
+          status: document.getElementById('capacity-status').value,
+        };
+
+        try {
+          const url = editingCapacityId ? `/api/admin/capacities/${editingCapacityId}` : '/api/admin/capacities';
+          const method = editingCapacityId ? 'PUT' : 'POST';
+          
+          const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            closeCapacityModal();
+            loadData();
+          } else {
+            const error = await response.json();
+            alert(error.error || 'Failed to save capacity');
+          }
+        } catch (error) {
+          alert('Failed to save capacity');
+        }
+      });
+
+      loadData();
+    </script>
+  </body>
+</html>
