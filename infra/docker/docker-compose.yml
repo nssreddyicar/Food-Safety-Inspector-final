@@ -1,0 +1,57 @@
+# =============================================================================
+# FILE: infra/docker/docker-compose.yml
+# PURPOSE: Development environment orchestration
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: fsi-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-fsi_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fsi_password}
+      POSTGRES_DB: ${POSTGRES_DB:-food_safety_inspector}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fsi_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Server
+  server:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.server
+    container_name: fsi-server
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://${POSTGRES_USER:-fsi_user}:${POSTGRES_PASSWORD:-fsi_password}@postgres:5432/${POSTGRES_DB:-food_safety_inspector}
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Web Admin Panel (optional)
+  web:
+    build:
+      context: ../../web-app
+      dockerfile: ../infra/docker/Dockerfile.web
+    container_name: fsi-web
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
