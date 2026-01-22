@@ -1,0 +1,1464 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Document Templates - Food Safety Inspector</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f3f4f6; min-height: 100vh; }
+      .header { background: #1E40AF; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+      .header-left { display: flex; align-items: center; gap: 12px; }
+      .header-logo { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+      .header-logo svg { width: 24px; height: 24px; fill: white; }
+      .header-title { font-size: 18px; font-weight: 600; }
+      .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; text-decoration: none; }
+      .back-btn:hover { background: rgba(255,255,255,0.2); }
+      .main { padding: 24px; max-width: 1400px; margin: 0 auto; }
+      .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+      .page-title { font-size: 24px; font-weight: 700; color: #1f2937; }
+      .add-btn { background: #1E40AF; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+      .add-btn:hover { background: #1e3a8a; }
+      .add-btn svg { width: 20px; height: 20px; fill: white; }
+      .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+      table { width: 100%; border-collapse: collapse; }
+      th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; }
+      td { padding: 16px; border-bottom: 1px solid #e5e7eb; font-size: 14px; color: #1f2937; vertical-align: top; }
+      tr:last-child td { border-bottom: none; }
+      tr:hover { background: #f9fafb; }
+      .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; display: inline-block; }
+      .status-active { background: #d1fae5; color: #059669; }
+      .status-inactive { background: #fee2e2; color: #dc2626; }
+      .category-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: #dbeafe; color: #1E40AF; display: inline-block; }
+      .action-btns { display: flex; gap: 8px; }
+      .action-btn { padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; border: none; }
+      .edit-btn { background: #eff6ff; color: #1E40AF; }
+      .edit-btn:hover { background: #dbeafe; }
+      .preview-btn { background: #f0fdf4; color: #059669; }
+      .preview-btn:hover { background: #dcfce7; }
+      .delete-btn { background: #fef2f2; color: #dc2626; }
+      .delete-btn:hover { background: #fee2e2; }
+      .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: flex-start; justify-content: center; padding: 20px; overflow-y: auto; }
+      .modal.show { display: flex; }
+      .modal-content { background: white; border-radius: 12px; padding: 24px; width: 100%; max-width: 1400px; margin: 20px 0; }
+      .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #1f2937; }
+      .modal-grid { display: grid; grid-template-columns: minmax(400px, 1fr) minmax(300px, 1fr); gap: 24px; }
+      .form-column { max-height: 80vh; overflow-y: auto; padding-right: 16px; min-width: 400px; }
+      .preview-column { position: sticky; top: 0; min-width: 300px; overflow: hidden; }
+      .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+      .form-row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
+      .form-group { margin-bottom: 16px; }
+      .form-group.full-width { grid-column: 1 / -1; }
+      .form-label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+      .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; }
+      .form-textarea { min-height: 200px; font-family: monospace; resize: vertical; }
+      .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #1E40AF; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+      .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+      .cancel-btn { padding: 10px 20px; border: 1px solid #d1d5db; background: white; border-radius: 8px; font-size: 14px; cursor: pointer; }
+      .cancel-btn:hover { background: #f9fafb; }
+      .save-btn { padding: 10px 20px; background: #1E40AF; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+      .save-btn:hover { background: #1e3a8a; }
+      .empty-state { padding: 60px 20px; text-align: center; color: #6b7280; }
+      .empty-state svg { width: 64px; height: 64px; fill: #d1d5db; margin-bottom: 16px; }
+      .empty-state h3 { font-size: 18px; color: #374151; margin-bottom: 8px; }
+      .export-btn { background: #f0fdf4; color: #059669; }
+      .export-btn:hover { background: #dcfce7; }
+      .header-actions { display: flex; gap: 12px; align-items: center; }
+      .secondary-btn { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+      .secondary-btn:hover { background: #e5e7eb; }
+      .secondary-btn svg { width: 18px; height: 18px; fill: currentColor; }
+      .import-input { display: none; }
+      .dropdown { position: relative; display: inline-block; }
+      .dropdown-content { display: none; position: absolute; right: 0; top: 100%; margin-top: 4px; background: white; min-width: 200px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; z-index: 100; overflow: hidden; }
+      .dropdown.show .dropdown-content { display: block; }
+      .dropdown-item { padding: 12px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; color: #374151; }
+      .dropdown-item:hover { background: #f3f4f6; }
+      .dropdown-item svg { width: 18px; height: 18px; fill: #6b7280; }
+      .dropdown-divider { height: 1px; background: #e5e7eb; margin: 4px 0; }
+      .template-info { margin-bottom: 4px; font-weight: 600; }
+      .template-desc { color: #6b7280; font-size: 13px; }
+      .template-meta { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+      .section-divider { border-top: 1px solid #e5e7eb; margin: 20px 0; padding-top: 16px; }
+      .section-title { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px; }
+      .placeholders-panel { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+      .placeholders-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; transition: background 0.15s; }
+      .placeholders-header:hover { background: #f3f4f6; }
+      .placeholders-title { display: flex; align-items: center; gap: 10px; font-weight: 600; color: #374151; font-size: 14px; }
+      .placeholder-count { background: #1E40AF; color: white; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+      .chevron { transition: transform 0.2s; }
+      .chevron.open { transform: rotate(180deg); }
+      .placeholders-content { border-top: 1px solid #e5e7eb; max-height: 400px; overflow-y: auto; }
+      .placeholders-search { padding: 12px; border-bottom: 1px solid #e5e7eb; background: white; position: sticky; top: 0; z-index: 1; }
+      .placeholders-categories { padding: 12px; }
+      .placeholder-category { margin-bottom: 16px; }
+      .placeholder-category:last-child { margin-bottom: 0; }
+      .category-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+      .category-title::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
+      .placeholder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+      .placeholder-item { display: flex; flex-direction: column; padding: 10px 12px; background: white; border: 1px solid #e5e7eb; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+      .placeholder-item:hover { border-color: #1E40AF; background: #eff6ff; transform: translateY(-1px); }
+      .placeholder-key { font-family: monospace; font-size: 12px; color: #1E40AF; font-weight: 600; margin-bottom: 2px; word-break: break-all; }
+      .placeholder-desc { font-size: 11px; color: #6b7280; line-height: 1.3; }
+      .placeholder-example { font-size: 10px; color: #9ca3af; margin-top: 4px; font-style: italic; }
+      .copy-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1f2937; color: white; padding: 10px 20px; border-radius: 8px; font-size: 13px; z-index: 9999; animation: toastIn 0.3s ease; }
+      @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+      .no-results { padding: 20px; text-align: center; color: #9ca3af; font-size: 13px; }
+      .format-info { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: #6b7280; }
+      .format-tag { background: #f3f4f6; padding: 2px 8px; border-radius: 4px; }
+      .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+      .checkbox-label input { width: 18px; height: 18px; }
+      .preview-container { background: #374151; border-radius: 8px; overflow: hidden; }
+      .preview-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #1f2937; }
+      .preview-title { font-size: 14px; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px; }
+      .preview-title svg { width: 16px; height: 16px; fill: white; }
+      .preview-controls { display: flex; align-items: center; gap: 8px; }
+      .zoom-btn { width: 32px; height: 32px; border: none; background: rgba(255,255,255,0.1); color: white; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+      .zoom-btn:hover { background: rgba(255,255,255,0.2); }
+      .zoom-btn.active { background: #1E40AF; }
+      .zoom-btn svg { width: 16px; height: 16px; fill: currentColor; }
+      .zoom-level { color: white; font-size: 12px; min-width: 50px; text-align: center; background: rgba(255,255,255,0.1); padding: 6px 10px; border-radius: 4px; }
+      .preview-viewport { background: #4b5563; padding: 20px; overflow: hidden; max-height: 600px; display: flex; justify-content: center; align-items: center; }
+      .preview-page-wrapper { display: flex; justify-content: center; align-items: center; position: relative; }
+      .preview-page { background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transform-origin: center center; transition: transform 0.2s ease; flex-shrink: 0; position: absolute; }
+      .page-size-label { color: #9ca3af; font-size: 11px; padding: 8px 16px; text-align: center; background: #1f2937; border-top: 1px solid #374151; }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-left">
+        <div class="header-logo">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        </div>
+        <div>
+          <div class="header-title">Document Templates</div>
+        </div>
+      </div>
+      <a href="/admin/dashboard" class="back-btn">Back to Dashboard</a>
+    </header>
+
+    <main class="main">
+      <div class="page-header">
+        <h1 class="page-title">Document Templates</h1>
+        <div class="header-actions">
+          <div class="dropdown" id="import-export-dropdown">
+            <button class="secondary-btn" onclick="toggleDropdown('import-export-dropdown')">
+              <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Import / Export
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-left: 4px;"><path d="M7 10l5 5 5-5z"/></svg>
+            </button>
+            <div class="dropdown-content">
+              <div class="dropdown-item" onclick="exportAllTemplatesJSON()">
+                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Export All (JSON)
+              </div>
+              <div class="dropdown-item" onclick="exportAllTemplatesHTML()">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                Export All (HTML Bundle)
+              </div>
+              <div class="dropdown-divider"></div>
+              <label class="dropdown-item" for="import-file">
+                <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+                Import Templates (JSON)
+              </label>
+            </div>
+          </div>
+          <input type="file" id="import-file" class="import-input" accept=".json" onchange="importTemplates(event)" />
+          <button class="add-btn" onclick="openModal()">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Add Template
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Template Name</th>
+              <th>Category</th>
+              <th>Page Format</th>
+              <th>Font</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="templates-table">
+          </tbody>
+        </table>
+        <div class="empty-state" id="empty-state" style="display: none;">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          <h3>No Templates Found</h3>
+          <p>Click "Add Template" to create your first document template</p>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <h2 class="modal-title" id="modal-title">Add Template</h2>
+        <form id="template-form">
+          <input type="hidden" id="template-id" />
+          
+          <div class="modal-grid">
+            <div class="form-column">
+              <div class="section-title">Basic Information</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Template Name *</label>
+                  <input type="text" class="form-input" id="name" required placeholder="e.g., Inspection Report" oninput="updatePreview()" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Category</label>
+                  <select class="form-select" id="category">
+                    <option value="general">General</option>
+                    <option value="inspection">Inspection</option>
+                    <option value="sample">Sample</option>
+                    <option value="notice">Notice</option>
+                    <option value="prosecution">Prosecution</option>
+                    <option value="certificate">Certificate</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-input" id="description" placeholder="Brief description of template purpose" />
+              </div>
+              
+              <div class="section-divider">
+                <div class="section-title">Page Setup</div>
+              </div>
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label class="form-label">Page Size</label>
+                  <select class="form-select" id="pageSize" onchange="updatePreview(true)">
+                    <option value="A4">A4 (210 x 297 mm)</option>
+                    <option value="Letter">Letter (8.5 x 11 in)</option>
+                    <option value="Legal">Legal (8.5 x 14 in)</option>
+                    <option value="A3">A3 (297 x 420 mm)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Orientation</label>
+                  <select class="form-select" id="orientation" onchange="updatePreview(true)">
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Status</label>
+                  <select class="form-select" id="status">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row-4">
+                <div class="form-group">
+                  <label class="form-label">Margin Top (mm)</label>
+                  <input type="number" class="form-input" id="marginTop" value="20" min="0" max="100" oninput="updatePreview()" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Margin Bottom (mm)</label>
+                  <input type="number" class="form-input" id="marginBottom" value="20" min="0" max="100" oninput="updatePreview()" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Margin Left (mm)</label>
+                  <input type="number" class="form-input" id="marginLeft" value="20" min="0" max="100" oninput="updatePreview()" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Margin Right (mm)</label>
+                  <input type="number" class="form-input" id="marginRight" value="20" min="0" max="100" oninput="updatePreview()" />
+                </div>
+              </div>
+              
+              <div class="section-divider">
+                <div class="section-title">Typography</div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Font Family</label>
+                  <select class="form-select" id="fontFamily" onchange="updatePreview()">
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Verdana">Verdana</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Font Size (pt)</label>
+                  <input type="number" class="form-input" id="fontSize" value="12" min="8" max="24" oninput="updatePreview()" />
+                </div>
+              </div>
+              
+              <div class="section-divider">
+                <div class="section-title">Header</div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="showHeader" checked onchange="updatePreview()" />
+                    Show Header
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Header Alignment</label>
+                  <select class="form-select" id="headerAlignment" onchange="updatePreview()">
+                    <option value="left">Left</option>
+                    <option value="center" selected>Center</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Header Text</label>
+                <input type="text" class="form-input" id="headerText" placeholder="Text to appear at top of each page" oninput="updatePreview()" />
+              </div>
+              
+              <div class="section-divider">
+                <div class="section-title">Footer</div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="showFooter" checked onchange="updatePreview()" />
+                    Show Footer
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Footer Alignment</label>
+                  <select class="form-select" id="footerAlignment" onchange="updatePreview()">
+                    <option value="left">Left</option>
+                    <option value="center" selected>Center</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Footer Text</label>
+                <input type="text" class="form-input" id="footerText" placeholder="Text to appear at bottom of each page" oninput="updatePreview()" />
+              </div>
+              
+              <div class="section-divider">
+                <div class="section-title">Page Numbers</div>
+              </div>
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="showPageNumbers" checked onchange="updatePreview()" />
+                    Show Page Numbers
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Format</label>
+                  <select class="form-select" id="pageNumberFormat" onchange="updatePreview()">
+                    <option value="page_x_of_y" selected>Page 1 of 2</option>
+                    <option value="x_of_y">1 of 2</option>
+                    <option value="x_colon">1 :</option>
+                    <option value="page_x">Page 1</option>
+                    <option value="x_only">1</option>
+                    <option value="dash_x_dash">— 1 —</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Position</label>
+                  <select class="form-select" id="pageNumberPosition" onchange="updatePreview()">
+                    <option value="left">Left</option>
+                    <option value="center" selected>Center</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label class="form-label">Offset (mm)</label>
+                  <input type="number" class="form-input" id="pageNumberOffset" value="0" min="-50" max="50" oninput="updatePreview()" />
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="showContinuationText" onchange="updatePreview()" />
+                    Show Continuation Text
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Continuation Format</label>
+                  <select class="form-select" id="continuationFormat" onchange="updatePreview()">
+                    <option value="contd_on_page" selected>—Contd. on Page X—</option>
+                    <option value="continued_on">Continued on Page X</option>
+                    <option value="see_next">See next page...</option>
+                    <option value="to_be_continued">To be continued...</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="section-divider">
+                <div class="section-title">Template Content</div>
+              </div>
+              
+              <div class="placeholders-panel">
+                <div class="placeholders-header" onclick="togglePlaceholders()">
+                  <div class="placeholders-title">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#1E40AF"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    <span>Available Placeholders</span>
+                    <span class="placeholder-count" id="placeholder-count">Loading...</span>
+                  </div>
+                  <svg class="chevron" id="placeholders-chevron" viewBox="0 0 24 24" width="20" height="20" fill="#6b7280"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                </div>
+                <div class="placeholders-content" id="placeholders-content" style="display: none;">
+                  <div class="placeholders-search">
+                    <input type="text" class="form-input" id="placeholder-search" placeholder="Search placeholders..." oninput="filterPlaceholders()" />
+                  </div>
+                  <div class="placeholders-categories" id="placeholders-categories">
+                    <div style="padding: 20px; text-align: center; color: #6b7280;">Loading placeholders...</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Content (HTML/CSS supported) *</label>
+                <textarea class="form-textarea" id="content" required placeholder="Enter template content with HTML/CSS..." oninput="updatePreview()" style="min-height: 300px;"></textarea>
+              </div>
+            </div>
+            
+            <div class="preview-column">
+              <div class="preview-container">
+                <div class="preview-header">
+                  <div class="preview-title">
+                    <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                    Live Preview
+                  </div>
+                  <div class="preview-controls">
+                    <button type="button" class="zoom-btn" onclick="zoomOut()" title="Zoom Out">
+                      <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+                    </button>
+                    <span class="zoom-level" id="zoom-level">40%</span>
+                    <button type="button" class="zoom-btn" onclick="zoomIn()" title="Zoom In">
+                      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    </button>
+                    <button type="button" class="zoom-btn" onclick="zoomFit()" title="Fit to View" id="fit-btn">
+                      <svg viewBox="0 0 24 24"><path d="M3 5v4h2V5h4V3H5c-1.1 0-2 .9-2 2zm2 10H3v4c0 1.1.9 2 2 2h4v-2H5v-4zm14 4h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zm0-16h-4v2h4v4h2V5c0-1.1-.9-2-2-2z"/></svg>
+                    </button>
+                    <button type="button" class="zoom-btn" onclick="zoomActual()" title="Actual Size" id="actual-btn">
+                      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="preview-viewport" id="preview-viewport">
+                  <div class="preview-page-wrapper" id="preview-page-wrapper">
+                    <div class="preview-page" id="preview-page"></div>
+                  </div>
+                </div>
+                <div class="page-size-label" id="page-size-label">A4 Portrait - 210 x 297 mm</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="save-btn">Save Template</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" id="preview-modal">
+      <div class="modal-content" style="max-width: 1000px; padding: 0;">
+        <div class="preview-container" style="border-radius: 12px;">
+          <div class="preview-header">
+            <div class="preview-title">
+              <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+              Template Preview
+            </div>
+            <div class="preview-controls">
+              <button type="button" class="zoom-btn" onclick="fullscreenZoomOut()" title="Zoom Out">
+                <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+              </button>
+              <span class="zoom-level" id="fullscreen-zoom-level">50%</span>
+              <button type="button" class="zoom-btn" onclick="fullscreenZoomIn()" title="Zoom In">
+                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              </button>
+              <button type="button" class="zoom-btn" onclick="fullscreenZoomFit()" title="Fit to View">
+                <svg viewBox="0 0 24 24"><path d="M3 5v4h2V5h4V3H5c-1.1 0-2 .9-2 2zm2 10H3v4c0 1.1.9 2 2 2h4v-2H5v-4zm14 4h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zm0-16h-4v2h4v4h2V5c0-1.1-.9-2-2-2z"/></svg>
+              </button>
+              <button type="button" class="zoom-btn" onclick="fullscreenZoomActual()" title="Actual Size">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+              </button>
+              <button type="button" class="zoom-btn" onclick="closePreviewModal()" title="Close" style="margin-left: 16px;">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="preview-viewport" id="fullscreen-preview-viewport" style="max-height: 70vh;">
+            <div class="preview-page-wrapper" id="fullscreen-preview-page-wrapper">
+              <div class="preview-page" id="fullscreen-preview-page"></div>
+            </div>
+          </div>
+          <div class="page-size-label" id="fullscreen-page-size-label">A4 Portrait - 210 x 297 mm</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let templates = [];
+      let editingId = null;
+      let previewTimeout = null;
+      let currentZoom = 0.4;
+      let fullscreenZoom = 0.5;
+      let placeholdersData = null;
+      let placeholdersExpanded = false;
+
+      // Placeholder functions
+      async function loadPlaceholders() {
+        try {
+          const res = await fetch('/api/placeholders');
+          placeholdersData = await res.json();
+          updatePlaceholderCount();
+          renderPlaceholders();
+        } catch (error) {
+          console.error('Failed to load placeholders:', error);
+          document.getElementById('placeholders-categories').innerHTML = '<div class="no-results">Failed to load placeholders</div>';
+        }
+      }
+
+      function updatePlaceholderCount() {
+        if (!placeholdersData) return;
+        let count = 0;
+        Object.values(placeholdersData.static).forEach(arr => count += arr.length);
+        count += (placeholdersData.workflow || []).length;
+        document.getElementById('placeholder-count').textContent = count + ' available';
+      }
+
+      function togglePlaceholders() {
+        placeholdersExpanded = !placeholdersExpanded;
+        const content = document.getElementById('placeholders-content');
+        const chevron = document.getElementById('placeholders-chevron');
+        content.style.display = placeholdersExpanded ? 'block' : 'none';
+        chevron.classList.toggle('open', placeholdersExpanded);
+      }
+
+      function renderPlaceholders(filter = '') {
+        if (!placeholdersData) return;
+        
+        const container = document.getElementById('placeholders-categories');
+        const searchTerm = filter.toLowerCase();
+        let html = '';
+        let hasResults = false;
+
+        const categoryLabels = {
+          officer: 'Officer Details',
+          jurisdiction: 'Jurisdiction',
+          datetime: 'Date & Time',
+          fbo: 'Food Business Operator',
+          inspection: 'Inspection',
+          sample: 'Sample Details',
+          manufacturer: 'Manufacturer',
+          lab: 'Laboratory'
+        };
+
+        // Render static placeholders by category
+        Object.entries(placeholdersData.static).forEach(([category, items]) => {
+          const filtered = items.filter(p => 
+            p.key.toLowerCase().includes(searchTerm) || 
+            p.description.toLowerCase().includes(searchTerm)
+          );
+          
+          if (filtered.length > 0) {
+            hasResults = true;
+            html += `<div class="placeholder-category">
+              <div class="category-title">${categoryLabels[category] || category}</div>
+              <div class="placeholder-grid">
+                ${filtered.map(p => `
+                  <div class="placeholder-item" onclick="insertPlaceholder('${p.key}')" title="Click to insert {{${p.key}}}">
+                    <span class="placeholder-key">{{${p.key}}}</span>
+                    <span class="placeholder-desc">${p.description}</span>
+                    <span class="placeholder-example">e.g., ${p.example}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>`;
+          }
+        });
+
+        // Render workflow placeholders
+        const workflowFiltered = (placeholdersData.workflow || []).filter(p =>
+          p.key.toLowerCase().includes(searchTerm) ||
+          p.description.toLowerCase().includes(searchTerm)
+        );
+
+        if (workflowFiltered.length > 0) {
+          hasResults = true;
+          html += `<div class="placeholder-category">
+            <div class="category-title">Workflow Input Fields (Dynamic)</div>
+            <div class="placeholder-grid">
+              ${workflowFiltered.map(p => `
+                <div class="placeholder-item" onclick="insertPlaceholder('${p.key}')" title="Click to insert {{${p.key}}}">
+                  <span class="placeholder-key">{{${p.key}}}</span>
+                  <span class="placeholder-desc">${p.description}</span>
+                  <span class="placeholder-example">e.g., ${p.example}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>`;
+        }
+
+        if (!hasResults) {
+          html = '<div class="no-results">No placeholders match your search</div>';
+        }
+
+        container.innerHTML = html;
+      }
+
+      function filterPlaceholders() {
+        const search = document.getElementById('placeholder-search').value;
+        renderPlaceholders(search);
+      }
+
+      function insertPlaceholder(key) {
+        const textarea = document.getElementById('content');
+        const placeholder = `{{${key}}}`;
+        
+        // Insert at cursor position or append
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+        
+        textarea.value = text.substring(0, start) + placeholder + text.substring(end);
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = start + placeholder.length;
+        
+        // Show toast
+        showToast(`Inserted {{${key}}}`);
+        
+        // Update preview
+        updatePreview();
+      }
+
+      function showToast(message) {
+        const existing = document.querySelector('.copy-toast');
+        if (existing) existing.remove();
+        
+        const toast = document.createElement('div');
+        toast.className = 'copy-toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => toast.remove(), 2000);
+      }
+
+      const pageSizes = {
+        'A4': { width: 210, height: 297, label: 'A4' },
+        'Letter': { width: 215.9, height: 279.4, label: 'Letter' },
+        'Legal': { width: 215.9, height: 355.6, label: 'Legal' },
+        'A3': { width: 297, height: 420, label: 'A3' }
+      };
+
+      const mmToPx = 3.7795275591;
+
+      async function loadData() {
+        try {
+          const res = await fetch('/api/admin/templates');
+          templates = await res.json();
+          renderTable();
+        } catch (error) {
+          console.error('Failed to load templates:', error);
+        }
+      }
+
+      function formatDate(date) {
+        if (!date) return '-';
+        return new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      }
+
+      function renderTable() {
+        const tbody = document.getElementById('templates-table');
+        const emptyState = document.getElementById('empty-state');
+        
+        if (templates.length === 0) {
+          tbody.innerHTML = '';
+          emptyState.style.display = 'block';
+          return;
+        }
+        
+        emptyState.style.display = 'none';
+        tbody.innerHTML = templates.map(template => {
+          return `
+            <tr>
+              <td>
+                <div class="template-info">${template.name}</div>
+                ${template.description ? `<div class="template-desc">${template.description}</div>` : ''}
+                <div class="template-meta">Created: ${formatDate(template.createdAt)}</div>
+              </td>
+              <td><span class="category-badge">${template.category}</span></td>
+              <td>
+                <div class="format-info">
+                  <span class="format-tag">${template.pageSize}</span>
+                  <span class="format-tag">${template.orientation}</span>
+                </div>
+              </td>
+              <td>
+                <div class="format-info">
+                  <span class="format-tag">${template.fontFamily}</span>
+                  <span class="format-tag">${template.fontSize}pt</span>
+                </div>
+              </td>
+              <td><span class="status-badge status-${template.status}">${template.status}</span></td>
+              <td>
+                <div class="action-btns">
+                  <button class="action-btn preview-btn" onclick="previewTemplate('${template.id}')">Preview</button>
+                  <button class="action-btn export-btn" onclick="exportTemplateHTML('${template.id}')" title="Export as HTML">HTML</button>
+                  <button class="action-btn edit-btn" onclick="editTemplate('${template.id}')">Edit</button>
+                  <button class="action-btn delete-btn" onclick="deleteTemplate('${template.id}')">Delete</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function getPageDimensions(pageSize, orientation) {
+        const size = pageSizes[pageSize] || pageSizes['A4'];
+        if (orientation === 'landscape') {
+          return { width: size.height, height: size.width, label: size.label };
+        }
+        return { width: size.width, height: size.height, label: size.label };
+      }
+
+      function generatePreviewContent(data) {
+        const content = data.content || '';
+        
+        // Check if content is raw HTML (starts with DOCTYPE, html tag, or contains typical HTML structure)
+        const trimmedContent = content.trim();
+        const isRawHtml = trimmedContent.startsWith('<!DOCTYPE') || 
+                          trimmedContent.startsWith('<html') ||
+                          (trimmedContent.startsWith('<') && (
+                            trimmedContent.includes('<style>') ||
+                            trimmedContent.includes('<div class=') ||
+                            trimmedContent.includes('<table')
+                          ));
+        
+        if (isRawHtml) {
+          // For raw HTML, use srcdoc iframe to completely isolate the template's CSS
+          // Inject scrollbar-hiding CSS into the content
+          const scrollbarHideCSS = '<style>html,body{scrollbar-width:none;-ms-overflow-style:none;}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;}</style>';
+          let modifiedContent = content;
+          if (content.includes('</head>')) {
+            modifiedContent = content.replace('</head>', scrollbarHideCSS + '</head>');
+          } else if (content.includes('<body')) {
+            modifiedContent = content.replace('<body', scrollbarHideCSS + '<body');
+          } else {
+            modifiedContent = scrollbarHideCSS + content;
+          }
+          
+          const escapedContent = modifiedContent
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;');
+          
+          return `
+            <iframe 
+              srcdoc="${escapedContent}"
+              style="width: 100%; height: 100%; border: none; background: white; overflow: hidden;"
+              sandbox="allow-same-origin"
+              scrolling="no"
+            ></iframe>
+          `;
+        }
+        
+        // Plain text content - use original formatting
+        const contentWithBreaks = content.replace(/\n/g, '<br>');
+        
+        const pageNumberPosition = data.pageNumberPosition || 'center';
+        const pageNumberOffset = data.pageNumberOffset || 0;
+        
+        let pageNumberStyle = `text-align: ${pageNumberPosition};`;
+        if (pageNumberPosition === 'left') {
+          pageNumberStyle += ` padding-left: ${pageNumberOffset}mm;`;
+        } else if (pageNumberPosition === 'right') {
+          pageNumberStyle += ` padding-right: ${-pageNumberOffset}mm;`;
+        } else {
+          pageNumberStyle += ` margin-left: ${pageNumberOffset}mm;`;
+        }
+
+        const headerHtml = data.showHeader && data.headerText ? `
+          <div style="text-align: ${data.headerAlignment || 'center'}; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb; margin-bottom: 16px; font-weight: 600;">
+            ${data.headerText}
+          </div>
+        ` : '';
+
+        const footerHtml = data.showFooter && data.footerText ? `
+          <div style="text-align: ${data.footerAlignment || 'center'}; padding-top: 12px; border-top: 1px solid #e5e7eb; margin-top: auto; font-size: 10pt; color: #6b7280;">
+            ${data.footerText}
+          </div>
+        ` : '';
+        
+        // Format page number based on selected format
+        const pageNumberFormat = data.pageNumberFormat || 'page_x_of_y';
+        let formattedPageNumber = 'Page 1 of 1';
+        switch(pageNumberFormat) {
+          case 'x_of_y': formattedPageNumber = '1 of 1'; break;
+          case 'x_colon': formattedPageNumber = '1 :'; break;
+          case 'page_x': formattedPageNumber = 'Page 1'; break;
+          case 'x_only': formattedPageNumber = '1'; break;
+          case 'dash_x_dash': formattedPageNumber = '— 1 —'; break;
+          default: formattedPageNumber = 'Page 1 of 1';
+        }
+        
+        // Continuation text for multi-page documents
+        const continuationFormat = data.continuationFormat || 'contd_on_page';
+        let continuationText = '';
+        if (data.showContinuationText) {
+          switch(continuationFormat) {
+            case 'contd_on_page': continuationText = '—Contd. on Page 2—'; break;
+            case 'continued_on': continuationText = 'Continued on Page 2'; break;
+            case 'see_next': continuationText = 'See next page...'; break;
+            case 'to_be_continued': continuationText = 'To be continued...'; break;
+          }
+        }
+        
+        // Build footer row with page number and continuation text on same line
+        let footerRowHtml = '';
+        if (data.showPageNumbers || data.showContinuationText) {
+          // Determine page number alignment style
+          let pageNumAlign = 'center';
+          let pageNumMargin = '';
+          if (pageNumberPosition === 'left') {
+            pageNumAlign = 'flex-start';
+            pageNumMargin = `margin-left: ${pageNumberOffset}mm;`;
+          } else if (pageNumberPosition === 'right') {
+            pageNumAlign = 'flex-end';
+            pageNumMargin = `margin-right: ${-pageNumberOffset}mm;`;
+          } else {
+            pageNumAlign = 'center';
+            pageNumMargin = `margin-left: ${pageNumberOffset}mm;`;
+          }
+          
+          const pageNumHtml = data.showPageNumbers ? `<span style="font-size: 10pt; color: #6b7280; ${pageNumMargin}">${formattedPageNumber}</span>` : '';
+          const contHtml = data.showContinuationText ? `<span style="font-size: 9pt; color: #9ca3af; font-style: italic;">${continuationText}</span>` : '';
+          
+          // Use flexbox to position elements
+          let justifyContent = 'center';
+          if (data.showPageNumbers && data.showContinuationText) {
+            // Both present: page number on its position, continuation on right
+            if (pageNumberPosition === 'left') {
+              justifyContent = 'space-between';
+            } else if (pageNumberPosition === 'right') {
+              justifyContent = 'space-between';
+            } else {
+              // Center page number with continuation on right
+              justifyContent = 'center';
+            }
+          } else if (data.showPageNumbers) {
+            justifyContent = pageNumAlign;
+          } else {
+            justifyContent = 'flex-end';
+          }
+          
+          if (data.showPageNumbers && data.showContinuationText && pageNumberPosition === 'center') {
+            // Special case: center page number with continuation on right
+            footerRowHtml = `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; width: 100%;">
+                <span style="flex: 1;"></span>
+                ${pageNumHtml}
+                <span style="flex: 1; text-align: right;">${contHtml}</span>
+              </div>
+            `;
+          } else {
+            footerRowHtml = `
+              <div style="display: flex; justify-content: ${justifyContent}; align-items: center; margin-top: 12px; width: 100%;">
+                ${pageNumHtml}
+                ${data.showPageNumbers && data.showContinuationText ? '<span style="flex: 1;"></span>' : ''}
+                ${contHtml}
+              </div>
+            `;
+          }
+        }
+
+        return `
+          <div style="font-family: '${data.fontFamily}', serif; font-size: ${data.fontSize}pt; line-height: 1.6; color: #1f2937; height: 100%; display: flex; flex-direction: column;">
+            ${headerHtml}
+            <div style="flex: 1; white-space: pre-wrap;">${contentWithBreaks}</div>
+            ${footerHtml}
+            ${footerRowHtml}
+          </div>
+        `;
+      }
+
+      function updatePreview(autoFit = false) {
+        clearTimeout(previewTimeout);
+        previewTimeout = setTimeout(() => {
+          const data = getFormData();
+          if (autoFit) {
+            const viewport = document.getElementById('preview-viewport');
+            const dims = getPageDimensions(data.pageSize, data.orientation);
+            const pageWidth = dims.width * mmToPx;
+            const pageHeight = dims.height * mmToPx;
+            const viewportWidth = viewport.clientWidth - 40;
+            const viewportHeight = viewport.clientHeight - 40;
+            currentZoom = Math.min(viewportWidth / pageWidth, viewportHeight / pageHeight, 0.8);
+            currentZoom = Math.max(currentZoom, 0.15);
+            document.getElementById('zoom-level').textContent = Math.round(currentZoom * 100) + '%';
+          }
+          renderPreviewPage(data, 'preview-page', 'page-size-label', currentZoom);
+        }, 100);
+      }
+
+      function renderPreviewPage(data, pageId, labelId, zoom) {
+        const dims = getPageDimensions(data.pageSize, data.orientation);
+        const page = document.getElementById(pageId);
+        const label = document.getElementById(labelId);
+        const wrapper = document.getElementById(pageId + '-wrapper');
+        
+        const widthPx = dims.width * mmToPx;
+        const heightPx = dims.height * mmToPx;
+        
+        // Check if content is raw HTML - if so, don't apply form margins (template has its own)
+        const trimmedContent = (data.content || '').trim();
+        const isRawHtml = trimmedContent.startsWith('<!DOCTYPE') || 
+                          trimmedContent.startsWith('<html') ||
+                          (trimmedContent.startsWith('<') && (
+                            trimmedContent.includes('<style>') ||
+                            trimmedContent.includes('<div class=') ||
+                            trimmedContent.includes('<table')
+                          ));
+        
+        // Size the wrapper to the scaled dimensions so the page fits visually
+        const scaledWidth = widthPx * zoom;
+        const scaledHeight = heightPx * zoom;
+        if (wrapper) {
+          wrapper.style.width = scaledWidth + 'px';
+          wrapper.style.height = scaledHeight + 'px';
+        }
+        
+        page.style.width = widthPx + 'px';
+        page.style.height = heightPx + 'px';
+        // Only apply form margins for plain text, not raw HTML templates
+        page.style.padding = isRawHtml ? '0' : `${data.marginTop * mmToPx}px ${data.marginRight * mmToPx}px ${data.marginBottom * mmToPx}px ${data.marginLeft * mmToPx}px`;
+        page.style.transform = `scale(${zoom})`;
+        page.style.transformOrigin = 'center center';
+        // Center the page within the wrapper
+        page.style.left = ((scaledWidth - widthPx) / 2) + 'px';
+        page.style.top = ((scaledHeight - heightPx) / 2) + 'px';
+        page.innerHTML = generatePreviewContent(data);
+        
+        label.textContent = `${dims.label} ${data.orientation.charAt(0).toUpperCase() + data.orientation.slice(1)} - ${dims.width} x ${dims.height} mm`;
+      }
+
+      function zoomIn() {
+        currentZoom = Math.min(currentZoom + 0.1, 1.5);
+        document.getElementById('zoom-level').textContent = Math.round(currentZoom * 100) + '%';
+        updatePreview();
+      }
+
+      function zoomOut() {
+        currentZoom = Math.max(currentZoom - 0.1, 0.2);
+        document.getElementById('zoom-level').textContent = Math.round(currentZoom * 100) + '%';
+        updatePreview();
+      }
+
+      function zoomFit() {
+        const viewport = document.getElementById('preview-viewport');
+        const data = getFormData();
+        const dims = getPageDimensions(data.pageSize, data.orientation);
+        const pageWidth = dims.width * mmToPx;
+        const pageHeight = dims.height * mmToPx;
+        const viewportWidth = viewport.clientWidth - 40;
+        const viewportHeight = viewport.clientHeight - 40;
+        currentZoom = Math.min(viewportWidth / pageWidth, viewportHeight / pageHeight, 0.8);
+        currentZoom = Math.max(currentZoom, 0.15);
+        document.getElementById('zoom-level').textContent = Math.round(currentZoom * 100) + '%';
+        updatePreview();
+      }
+
+      function zoomActual() {
+        currentZoom = 1;
+        document.getElementById('zoom-level').textContent = '100%';
+        updatePreview();
+      }
+
+      function fullscreenZoomIn() {
+        fullscreenZoom = Math.min(fullscreenZoom + 0.1, 1.5);
+        document.getElementById('fullscreen-zoom-level').textContent = Math.round(fullscreenZoom * 100) + '%';
+        renderFullscreenPreview();
+      }
+
+      function fullscreenZoomOut() {
+        fullscreenZoom = Math.max(fullscreenZoom - 0.1, 0.2);
+        document.getElementById('fullscreen-zoom-level').textContent = Math.round(fullscreenZoom * 100) + '%';
+        renderFullscreenPreview();
+      }
+
+      function fullscreenZoomFit() {
+        const viewport = document.getElementById('fullscreen-preview-viewport');
+        const template = templates.find(t => t.id === currentFullscreenTemplateId);
+        if (!template) return;
+        const dims = getPageDimensions(template.pageSize, template.orientation);
+        const pageWidth = dims.width * mmToPx;
+        const pageHeight = dims.height * mmToPx;
+        const viewportWidth = viewport.clientWidth - 40;
+        const viewportHeight = viewport.clientHeight - 40;
+        fullscreenZoom = Math.min(viewportWidth / pageWidth, viewportHeight / pageHeight, 1);
+        document.getElementById('fullscreen-zoom-level').textContent = Math.round(fullscreenZoom * 100) + '%';
+        renderFullscreenPreview();
+      }
+
+      function fullscreenZoomActual() {
+        fullscreenZoom = 1;
+        document.getElementById('fullscreen-zoom-level').textContent = '100%';
+        renderFullscreenPreview();
+      }
+
+      let currentFullscreenTemplateId = null;
+
+      function renderFullscreenPreview() {
+        const template = templates.find(t => t.id === currentFullscreenTemplateId);
+        if (template) {
+          renderPreviewPage(template, 'fullscreen-preview-page', 'fullscreen-page-size-label', fullscreenZoom);
+        }
+      }
+
+      function getFormData() {
+        return {
+          name: document.getElementById('name').value,
+          description: document.getElementById('description').value,
+          category: document.getElementById('category').value,
+          pageSize: document.getElementById('pageSize').value,
+          orientation: document.getElementById('orientation').value,
+          marginTop: parseInt(document.getElementById('marginTop').value) || 20,
+          marginBottom: parseInt(document.getElementById('marginBottom').value) || 20,
+          marginLeft: parseInt(document.getElementById('marginLeft').value) || 20,
+          marginRight: parseInt(document.getElementById('marginRight').value) || 20,
+          fontFamily: document.getElementById('fontFamily').value,
+          fontSize: parseInt(document.getElementById('fontSize').value) || 12,
+          showPageNumbers: document.getElementById('showPageNumbers').checked,
+          pageNumberFormat: document.getElementById('pageNumberFormat').value,
+          pageNumberPosition: document.getElementById('pageNumberPosition').value,
+          pageNumberOffset: parseInt(document.getElementById('pageNumberOffset').value) || 0,
+          showContinuationText: document.getElementById('showContinuationText').checked,
+          continuationFormat: document.getElementById('continuationFormat').value,
+          showHeader: document.getElementById('showHeader').checked,
+          showFooter: document.getElementById('showFooter').checked,
+          headerText: document.getElementById('headerText').value,
+          footerText: document.getElementById('footerText').value,
+          headerAlignment: document.getElementById('headerAlignment').value,
+          footerAlignment: document.getElementById('footerAlignment').value,
+          content: document.getElementById('content').value,
+          status: document.getElementById('status').value,
+        };
+      }
+
+      function openModal(template = null) {
+        const modal = document.getElementById('modal');
+        const title = document.getElementById('modal-title');
+        const form = document.getElementById('template-form');
+        
+        currentZoom = 0.4;
+        document.getElementById('zoom-level').textContent = '40%';
+        
+        if (template) {
+          title.textContent = 'Edit Template';
+          document.getElementById('template-id').value = template.id;
+          document.getElementById('name').value = template.name;
+          document.getElementById('description').value = template.description || '';
+          document.getElementById('category').value = template.category;
+          document.getElementById('pageSize').value = template.pageSize;
+          document.getElementById('orientation').value = template.orientation;
+          document.getElementById('marginTop').value = template.marginTop;
+          document.getElementById('marginBottom').value = template.marginBottom;
+          document.getElementById('marginLeft').value = template.marginLeft;
+          document.getElementById('marginRight').value = template.marginRight;
+          document.getElementById('fontFamily').value = template.fontFamily;
+          document.getElementById('fontSize').value = template.fontSize;
+          document.getElementById('showPageNumbers').checked = template.showPageNumbers !== false;
+          document.getElementById('pageNumberFormat').value = template.pageNumberFormat || 'page_x_of_y';
+          document.getElementById('pageNumberPosition').value = template.pageNumberPosition || 'center';
+          document.getElementById('pageNumberOffset').value = template.pageNumberOffset || 0;
+          document.getElementById('showContinuationText').checked = template.showContinuationText || false;
+          document.getElementById('continuationFormat').value = template.continuationFormat || 'contd_on_page';
+          document.getElementById('showHeader').checked = template.showHeader !== false;
+          document.getElementById('showFooter').checked = template.showFooter !== false;
+          document.getElementById('headerText').value = template.headerText || '';
+          document.getElementById('footerText').value = template.footerText || '';
+          document.getElementById('headerAlignment').value = template.headerAlignment || 'center';
+          document.getElementById('footerAlignment').value = template.footerAlignment || 'center';
+          document.getElementById('content').value = template.content;
+          document.getElementById('status').value = template.status;
+          editingId = template.id;
+        } else {
+          title.textContent = 'Add Template';
+          form.reset();
+          document.getElementById('template-id').value = '';
+          document.getElementById('marginTop').value = 20;
+          document.getElementById('marginBottom').value = 20;
+          document.getElementById('marginLeft').value = 20;
+          document.getElementById('marginRight').value = 20;
+          document.getElementById('fontSize').value = 12;
+          document.getElementById('pageNumberOffset').value = 0;
+          document.getElementById('showPageNumbers').checked = true;
+          document.getElementById('pageNumberFormat').value = 'page_x_of_y';
+          document.getElementById('showContinuationText').checked = false;
+          document.getElementById('continuationFormat').value = 'contd_on_page';
+          document.getElementById('showHeader').checked = true;
+          document.getElementById('showFooter').checked = true;
+          editingId = null;
+        }
+        
+        modal.classList.add('show');
+        setTimeout(() => updatePreview(true), 50);
+      }
+
+      function closeModal() {
+        document.getElementById('modal').classList.remove('show');
+        editingId = null;
+      }
+
+      function previewTemplate(id) {
+        const template = templates.find(t => t.id === id);
+        if (!template) return;
+        
+        currentFullscreenTemplateId = id;
+        fullscreenZoom = 0.5;
+        document.getElementById('fullscreen-zoom-level').textContent = '50%';
+        document.getElementById('preview-modal').classList.add('show');
+        setTimeout(() => {
+          fullscreenZoomFit();
+        }, 50);
+      }
+
+      function closePreviewModal() {
+        document.getElementById('preview-modal').classList.remove('show');
+        currentFullscreenTemplateId = null;
+      }
+
+      function editTemplate(id) {
+        const template = templates.find(t => t.id === id);
+        if (template) openModal(template);
+      }
+
+      async function deleteTemplate(id) {
+        if (!confirm('Are you sure you want to delete this template?')) return;
+        
+        try {
+          await fetch(`/api/admin/templates/${id}`, { method: 'DELETE' });
+          loadData();
+        } catch (error) {
+          alert('Failed to delete template');
+        }
+      }
+
+      document.getElementById('template-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const data = getFormData();
+
+        try {
+          const url = editingId ? `/api/admin/templates/${editingId}` : '/api/admin/templates';
+          const method = editingId ? 'PUT' : 'POST';
+          
+          const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            closeModal();
+            loadData();
+          } else {
+            const error = await response.json();
+            alert(error.error || 'Failed to save template');
+          }
+        } catch (error) {
+          alert('Failed to save template');
+        }
+      });
+
+      // Toggle dropdown
+      function toggleDropdown(id) {
+        const dropdown = document.getElementById(id);
+        dropdown.classList.toggle('show');
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+          document.querySelectorAll('.dropdown.show').forEach(d => d.classList.remove('show'));
+        }
+      });
+
+      // Export single template as HTML
+      function exportTemplateHTML(id) {
+        const template = templates.find(t => t.id === id);
+        if (!template) return;
+        
+        const htmlContent = generateExportableHTML(template);
+        downloadFile(htmlContent, `${sanitizeFilename(template.name)}.html`, 'text/html');
+        showToast(`Exported "${template.name}" as HTML`);
+      }
+
+      // Export all templates as JSON
+      function exportAllTemplatesJSON() {
+        if (templates.length === 0) {
+          alert('No templates to export');
+          return;
+        }
+        
+        const exportData = {
+          exportedAt: new Date().toISOString(),
+          version: '1.0',
+          count: templates.length,
+          templates: templates.map(t => ({
+            name: t.name,
+            description: t.description,
+            category: t.category,
+            pageSize: t.pageSize,
+            orientation: t.orientation,
+            marginTop: t.marginTop,
+            marginBottom: t.marginBottom,
+            marginLeft: t.marginLeft,
+            marginRight: t.marginRight,
+            fontFamily: t.fontFamily,
+            fontSize: t.fontSize,
+            showPageNumbers: t.showPageNumbers,
+            pageNumberPosition: t.pageNumberPosition,
+            pageNumberOffset: t.pageNumberOffset,
+            showHeader: t.showHeader,
+            showFooter: t.showFooter,
+            headerText: t.headerText,
+            footerText: t.footerText,
+            headerAlignment: t.headerAlignment,
+            footerAlignment: t.footerAlignment,
+            content: t.content,
+            status: t.status
+          }))
+        };
+        
+        const jsonStr = JSON.stringify(exportData, null, 2);
+        const date = new Date().toISOString().split('T')[0];
+        downloadFile(jsonStr, `templates_export_${date}.json`, 'application/json');
+        showToast(`Exported ${templates.length} templates as JSON`);
+        document.getElementById('import-export-dropdown').classList.remove('show');
+      }
+
+      // Export all templates as HTML bundle
+      function exportAllTemplatesHTML() {
+        if (templates.length === 0) {
+          alert('No templates to export');
+          return;
+        }
+        
+        let bundleHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Template Bundle Export - ${new Date().toLocaleDateString()}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 20px; background: #f3f4f6; }
+    .header { background: #1E40AF; color: white; padding: 20px; margin: -20px -20px 20px -20px; }
+    .header h1 { margin: 0 0 8px 0; }
+    .header p { margin: 0; opacity: 0.8; }
+    .template { background: white; border-radius: 8px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .template-header { background: #f9fafb; padding: 16px; border-bottom: 1px solid #e5e7eb; }
+    .template-name { font-size: 18px; font-weight: 600; color: #1f2937; margin: 0 0 4px 0; }
+    .template-meta { font-size: 12px; color: #6b7280; }
+    .template-content { padding: 20px; }
+    .page-preview { border: 1px solid #e5e7eb; background: white; margin: 0 auto; padding: 20px; }
+    @media print { .header { display: none; } .template { break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Document Templates Export</h1>
+    <p>Exported on ${new Date().toLocaleString()} - ${templates.length} template(s)</p>
+  </div>
+`;
+        
+        templates.forEach((template, index) => {
+          bundleHtml += `
+  <div class="template">
+    <div class="template-header">
+      <h2 class="template-name">${index + 1}. ${template.name}</h2>
+      <div class="template-meta">
+        Category: ${template.category} | Page: ${template.pageSize} ${template.orientation} | Font: ${template.fontFamily} ${template.fontSize}pt | Status: ${template.status}
+      </div>
+    </div>
+    <div class="template-content">
+      <div class="page-preview">
+        ${template.content || '<em>No content</em>'}
+      </div>
+    </div>
+  </div>
+`;
+        });
+        
+        bundleHtml += `
+</body>
+</html>`;
+        
+        const date = new Date().toISOString().split('T')[0];
+        downloadFile(bundleHtml, `templates_bundle_${date}.html`, 'text/html');
+        showToast(`Exported ${templates.length} templates as HTML bundle`);
+        document.getElementById('import-export-dropdown').classList.remove('show');
+      }
+
+      // Import templates from JSON
+      async function importTemplates(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          
+          if (!data.templates || !Array.isArray(data.templates)) {
+            throw new Error('Invalid format: missing templates array');
+          }
+          
+          const count = data.templates.length;
+          if (count === 0) {
+            alert('No templates found in file');
+            return;
+          }
+          
+          if (!confirm(`Import ${count} template(s)? This will create new templates (duplicates will have unique names).`)) {
+            event.target.value = '';
+            return;
+          }
+          
+          let imported = 0;
+          let errors = 0;
+          
+          for (const template of data.templates) {
+            try {
+              const response = await fetch('/api/admin/templates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: template.name + ' (Imported)',
+                  description: template.description || '',
+                  category: template.category || 'general',
+                  pageSize: template.pageSize || 'A4',
+                  orientation: template.orientation || 'portrait',
+                  marginTop: template.marginTop || 20,
+                  marginBottom: template.marginBottom || 20,
+                  marginLeft: template.marginLeft || 20,
+                  marginRight: template.marginRight || 20,
+                  fontFamily: template.fontFamily || 'Times New Roman',
+                  fontSize: template.fontSize || 12,
+                  showPageNumbers: template.showPageNumbers !== false,
+                  pageNumberPosition: template.pageNumberPosition || 'center',
+                  pageNumberOffset: template.pageNumberOffset || 0,
+                  showHeader: template.showHeader !== false,
+                  showFooter: template.showFooter !== false,
+                  headerText: template.headerText || '',
+                  footerText: template.footerText || '',
+                  headerAlignment: template.headerAlignment || 'center',
+                  footerAlignment: template.footerAlignment || 'center',
+                  content: template.content || '',
+                  status: template.status || 'active'
+                })
+              });
+              
+              if (response.ok) {
+                imported++;
+              } else {
+                errors++;
+              }
+            } catch (e) {
+              errors++;
+            }
+          }
+          
+          loadData();
+          showToast(`Imported ${imported} template(s)${errors > 0 ? `, ${errors} failed` : ''}`);
+          
+        } catch (error) {
+          alert('Failed to import templates: ' + error.message);
+        }
+        
+        event.target.value = '';
+        document.getElementById('import-export-dropdown').classList.remove('show');
+      }
+
+      // Generate exportable HTML for a template
+      function generateExportableHTML(template) {
+        const dims = getPageDimensions(template.pageSize, template.orientation);
+        const content = template.content || '';
+        const trimmedContent = content.trim();
+        const isRawHtml = trimmedContent.startsWith('<!DOCTYPE') || 
+                          trimmedContent.startsWith('<html') ||
+                          (trimmedContent.startsWith('<') && (
+                            trimmedContent.includes('<style>') ||
+                            trimmedContent.includes('<div class=') ||
+                            trimmedContent.includes('<table')
+                          ));
+        
+        if (isRawHtml) {
+          // Return raw HTML content as-is
+          return content;
+        }
+        
+        // Generate wrapper HTML for plain text content
+        return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>${template.name}</title>
+  <style>
+    @page {
+      size: ${dims.width}mm ${dims.height}mm;
+      margin: ${template.marginTop}mm ${template.marginRight}mm ${template.marginBottom}mm ${template.marginLeft}mm;
+    }
+    body {
+      font-family: '${template.fontFamily}', serif;
+      font-size: ${template.fontSize}pt;
+      line-height: 1.6;
+      color: #1f2937;
+      margin: 0;
+      padding: ${template.marginTop}mm ${template.marginRight}mm ${template.marginBottom}mm ${template.marginLeft}mm;
+    }
+    .header { text-align: ${template.headerAlignment || 'center'}; padding-bottom: 12pt; border-bottom: 1px solid #e5e7eb; margin-bottom: 16pt; font-weight: 600; }
+    .footer { text-align: ${template.footerAlignment || 'center'}; padding-top: 12pt; border-top: 1px solid #e5e7eb; margin-top: auto; font-size: 10pt; color: #6b7280; }
+    .content { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  ${template.showHeader && template.headerText ? `<div class="header">${template.headerText}</div>` : ''}
+  <div class="content">${content.replace(/\n/g, '<br>')}</div>
+  ${template.showFooter && template.footerText ? `<div class="footer">${template.footerText}</div>` : ''}
+</body>
+</html>`;
+      }
+
+      // Helper: Download file
+      function downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      // Helper: Sanitize filename
+      function sanitizeFilename(name) {
+        return name.replace(/[^a-z0-9_-]/gi, '_').substring(0, 50);
+      }
+
+      // Helper: Show toast
+      function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'copy-toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      }
+
+      loadData();
+      loadPlaceholders();
+    </script>
+  </body>
+</html>
