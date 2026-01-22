@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Institutional Inspections - Admin Panel</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; min-height: 100vh; }
+    .header { background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%); padding: 20px 40px; color: white; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 24px; font-weight: 600; }
+    .header-nav { display: flex; gap: 20px; align-items: center; }
+    .header-nav a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; }
+    .header-nav a:hover { color: white; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 30px; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab { padding: 12px 24px; background: white; border: 1px solid #e0e0e0; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+    .tab:hover { background: #f0f0f0; }
+    .tab.active { background: #1E40AF; color: white; border-color: #1E40AF; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 24px; margin-bottom: 24px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .card-title { font-size: 18px; font-weight: 600; color: #1E40AF; }
+    .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-primary { background: #1E40AF; color: white; }
+    .btn-primary:hover { background: #1E3A8A; }
+    .btn-danger { background: #DC2626; color: white; }
+    .btn-danger:hover { background: #B91C1C; }
+    .btn svg { width: 16px; height: 16px; fill: currentColor; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f9fafb; font-weight: 600; color: #374151; font-size: 13px; text-transform: uppercase; }
+    tr:hover { background: #f9fafb; }
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .badge-high { background: #FEE2E2; color: #DC2626; }
+    .badge-medium { background: #FEF3C7; color: #D97706; }
+    .badge-low { background: #D1FAE5; color: #059669; }
+    .badge-active { background: #D1FAE5; color: #059669; }
+    .badge-inactive { background: #E5E7EB; color: #6B7280; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; margin-bottom: 6px; font-weight: 500; color: #374151; }
+    .form-input, .form-select { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+    .form-input:focus, .form-select:focus { outline: none; border-color: #1E40AF; box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1); }
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 24px; }
+    .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .stat-value { font-size: 32px; font-weight: 700; color: #1E40AF; }
+    .stat-label { color: #6b7280; font-size: 14px; margin-top: 4px; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #6b7280; }
+    .empty-state h3 { font-size: 18px; margin-bottom: 8px; color: #374151; }
+    .pillar-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .pillar-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .pillar-title { font-weight: 600; color: #1E40AF; }
+    .pillar-toggle { transform: rotate(0deg); transition: transform 0.2s; }
+    .pillar-toggle.expanded { transform: rotate(180deg); }
+    .pillar-indicators { margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb; display: none; }
+    .pillar-indicators.show { display: block; }
+    .indicator-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+    .indicator-row:last-child { border-bottom: none; }
+    .weight-badge { padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .config-row { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #f9fafb; border-radius: 8px; margin-bottom: 12px; }
+    .config-key { font-weight: 500; }
+    .config-value { display: flex; align-items: center; gap: 12px; }
+    .config-input { width: 150px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Institutional Food Safety Inspections</h1>
+    <div class="header-nav">
+      <a href="/admin">Dashboard</a>
+      <a href="/admin/complaints">Complaints</a>
+      <a href="/admin/institutional-inspections">Institutional Inspections</a>
+      <a href="/admin" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('overview')">Overview</div>
+      <div class="tab" onclick="showTab('pillars')">Pillars & Indicators</div>
+      <div class="tab" onclick="showTab('institution-types')">Institution Types</div>
+      <div class="tab" onclick="showTab('person-types')">Person Types</div>
+      <div class="tab" onclick="showTab('config')">Risk Thresholds</div>
+    </div>
+
+    <div id="overview" class="tab-content active">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalInspections">0</div>
+          <div class="stat-label">Total Inspections</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="highRisk">0</div>
+          <div class="stat-label">High Risk</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="mediumRisk">0</div>
+          <div class="stat-label">Medium Risk</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="lowRisk">0</div>
+          <div class="stat-label">Low Risk</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Recent Inspections</h2>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Institution</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Risk</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="inspectionsTable">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="pillars" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Assessment Pillars & Indicators</h2>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn" onclick="resetToDefaults()" style="background: #fef3c7; color: #92400e; border: 1px solid #fcd34d;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/></svg>
+              Reset to Defaults
+            </button>
+            <button class="btn btn-primary" onclick="openAddPillarModal()">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              Add Pillar
+            </button>
+          </div>
+        </div>
+        <p style="color: #6b7280; margin-bottom: 20px;">Configure assessment pillars and their indicators. Click a pillar to expand and manage its indicators. Use "Reset to Defaults" to restore the standard FSSAI 7 pillars and 35 indicators.</p>
+        <div id="pillarsContainer"></div>
+      </div>
+    </div>
+
+    <div id="institution-types" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Institution Types</h2>
+          <button class="btn btn-primary" onclick="openAddTypeModal()">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Add Type
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Code</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="typesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="person-types" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Person Types Configuration</h2>
+          <button class="btn btn-primary" onclick="openAddPersonTypeModal()">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Add Person Type
+          </button>
+        </div>
+        <p style="color: #6b7280; margin-bottom: 20px;">Configure person types that officers can add during institutional inspections. Each type has customizable fields that appear in the mobile app and on photo watermarks.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Type Name</th>
+              <th>Code</th>
+              <th>Fields</th>
+              <th>Max Count</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="personTypesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="config" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Risk Classification Thresholds</h2>
+        </div>
+        <p style="color: #6b7280; margin-bottom: 20px;">Configure scoring thresholds for risk classification. Changes apply to new inspections only.</p>
+        <div id="configContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="pillarModal">
+    <div class="modal-content">
+      <h2 class="modal-title" id="pillarModalTitle">Add Pillar</h2>
+      <input type="hidden" id="editPillarId">
+      <div style="display: grid; grid-template-columns: 80px 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Number</label>
+          <input type="number" class="form-input" id="pillarNumber" min="1" max="20">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pillar Name *</label>
+          <input type="text" class="form-input" id="pillarName" placeholder="e.g., Hygiene & Sanitation">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" id="pillarDescription" rows="2" placeholder="Brief description of this pillar"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closePillarModal()">Cancel</button>
+        <button class="btn btn-danger" id="deletePillarBtn" style="display: none;" onclick="deletePillar()">Delete</button>
+        <button class="btn btn-primary" onclick="savePillar()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="indicatorModal">
+    <div class="modal-content">
+      <h2 class="modal-title" id="indicatorModalTitle">Edit Indicator</h2>
+      <input type="hidden" id="editIndicatorId">
+      <input type="hidden" id="indicatorPillarId">
+      <div style="display: grid; grid-template-columns: 80px 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Number</label>
+          <input type="number" class="form-input" id="indicatorNumber" min="1" max="20">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Indicator Name *</label>
+          <input type="text" class="form-input" id="indicatorName" placeholder="e.g., Hand washing facilities available">
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Risk Level</label>
+          <select class="form-select" id="indicatorRiskLevel" onchange="updateWeightFromRisk()">
+            <option value="high">High (Weight: 3)</option>
+            <option value="medium">Medium (Weight: 2)</option>
+            <option value="low">Low (Weight: 1)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Weight</label>
+          <input type="number" class="form-input" id="indicatorWeight" min="1" max="5">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" id="indicatorDescription" rows="2" placeholder="Detailed description of what to check"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeIndicatorModal()">Cancel</button>
+        <button class="btn btn-danger" id="deleteIndicatorBtn" style="display: none;" onclick="deleteIndicator()">Delete</button>
+        <button class="btn btn-primary" onclick="saveIndicator()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="typeModal">
+    <div class="modal-content">
+      <h2 class="modal-title" id="typeModalTitle">Add Institution Type</h2>
+      <input type="hidden" id="editTypeId">
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-input" id="typeName" placeholder="e.g., Mid Day Meal School">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Code (3-20 chars)</label>
+        <input type="text" class="form-input" id="typeCode" placeholder="e.g., MDM" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="typeCategory">
+          <option value="education">Education</option>
+          <option value="healthcare">Healthcare</option>
+          <option value="government">Government</option>
+          <option value="religious">Religious</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" id="typeDescription" rows="2"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeTypeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveType()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="personTypeModal">
+    <div class="modal-content" style="max-width: 700px;">
+      <h2 class="modal-title" id="personTypeModalTitle">Add Person Type</h2>
+      <input type="hidden" id="editPersonTypeId">
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Type Name *</label>
+          <input type="text" class="form-input" id="personTypeName" placeholder="e.g., Head of Institution">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type Code *</label>
+          <input type="text" class="form-input" id="personTypeCode" placeholder="e.g., head_of_institution">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <input type="text" class="form-input" id="personTypeDescription" placeholder="Brief description of this person type">
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Display Order</label>
+          <input type="number" class="form-input" id="personTypeDisplayOrder" value="1" min="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Count</label>
+          <input type="number" class="form-input" id="personTypeMaxCount" value="1" min="1" max="10">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="personTypeIsActive">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <label class="form-label" style="margin: 0;">Custom Fields</label>
+          <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="addPersonTypeField()">+ Add Field</button>
+        </div>
+        <div id="personTypeFieldsContainer" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; background: #f9fafb;"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" onclick="closePersonTypeModal()">Cancel</button>
+        <button class="btn btn-danger" id="deletePersonTypeBtn" style="display: none;" onclick="deletePersonType()">Delete</button>
+        <button class="btn btn-primary" onclick="savePersonType()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let pillars = [];
+    let indicators = [];
+    let institutionTypes = [];
+    let personTypes = [];
+    let personTypeFields = [];
+    let config = [];
+
+    async function init() {
+      await Promise.all([
+        loadPillars(),
+        loadIndicators(),
+        loadInstitutionTypes(),
+        loadPersonTypes(),
+        loadConfig(),
+        loadStats(),
+        loadInspections()
+      ]);
+    }
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/institutional-inspections/stats');
+        const stats = await res.json();
+        document.getElementById('totalInspections').textContent = stats.total || 0;
+        document.getElementById('highRisk').textContent = stats.highRisk || 0;
+        document.getElementById('mediumRisk').textContent = stats.mediumRisk || 0;
+        document.getElementById('lowRisk').textContent = stats.lowRisk || 0;
+      } catch (e) {
+        console.error('Failed to load stats:', e);
+      }
+    }
+
+    async function loadInspections() {
+      try {
+        const res = await fetch('/api/institutional-inspections?limit=20');
+        const inspections = await res.json();
+        const tbody = document.getElementById('inspectionsTable');
+
+        if (!inspections || inspections.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><h3>No inspections yet</h3><p>Inspections will appear here when created from the mobile app</p></td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = inspections.map(i => {
+          const type = institutionTypes.find(t => t.id === i.institutionTypeId);
+          const riskClass = i.riskClassification === 'high' ? 'badge-high' : i.riskClassification === 'medium' ? 'badge-medium' : 'badge-low';
+          return `
+            <tr>
+              <td><strong>${i.inspectionCode}</strong></td>
+              <td>${i.institutionName}</td>
+              <td>${type?.name || '-'}</td>
+              <td>${new Date(i.inspectionDate).toLocaleDateString()}</td>
+              <td><span class="badge ${riskClass}">${i.riskClassification || 'Pending'}</span></td>
+              <td><span class="badge ${i.status === 'submitted' ? 'badge-active' : 'badge-inactive'}">${i.status}</span></td>
+            </tr>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error('Failed to load inspections:', e);
+      }
+    }
+
+    async function loadPillars() {
+      try {
+        const res = await fetch('/api/admin/institutional-inspection/pillars');
+        pillars = await res.json();
+        renderPillars();
+      } catch (e) {
+        console.error('Failed to load pillars:', e);
+      }
+    }
+
+    async function loadIndicators() {
+      try {
+        const res = await fetch('/api/admin/institutional-inspection/indicators');
+        indicators = await res.json();
+        renderPillars();
+      } catch (e) {
+        console.error('Failed to load indicators:', e);
+      }
+    }
+
+    function renderPillars() {
+      const container = document.getElementById('pillarsContainer');
+      if (!pillars.length) {
+        container.innerHTML = '<div class="empty-state"><h3>No pillars configured</h3><p>Click "Add Pillar" to create assessment pillars</p></div>';
+        return;
+      }
+
+      container.innerHTML = pillars.map((pillar, idx) => {
+        const pillarIndicators = indicators.filter(i => i.pillarId === pillar.id);
+        return `
+          <div class="pillar-card">
+            <div class="pillar-header">
+              <div onclick="togglePillar(${idx})" style="flex: 1; cursor: pointer;">
+                <span class="pillar-title">Pillar ${pillar.pillarNumber}: ${pillar.name}</span>
+                <span style="color: #6b7280; margin-left: 10px;">(${pillarIndicators.length} indicators)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <button class="btn" style="padding: 4px 10px; font-size: 12px;" onclick="event.stopPropagation(); editPillar('${pillar.id}')">Edit</button>
+                <svg class="pillar-toggle" id="toggle-${idx}" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="togglePillar(${idx})" style="cursor: pointer;">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="pillar-indicators" id="indicators-${idx}">
+              ${pillarIndicators.length === 0 ? '<div style="text-align: center; color: #9ca3af; padding: 12px;">No indicators in this pillar</div>' : pillarIndicators.map(ind => `
+                <div class="indicator-row">
+                  <div>
+                    <span>${ind.indicatorNumber}. ${ind.name}</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="weight-badge badge-${ind.riskLevel}">${ind.riskLevel.toUpperCase()} (${ind.weight})</span>
+                    <button class="btn" style="padding: 4px 8px; font-size: 12px;" onclick="editIndicator('${ind.id}')">Edit</button>
+                  </div>
+                </div>
+              `).join('')}
+              <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #e5e7eb;">
+                <button class="btn btn-primary" style="width: 100%; padding: 8px; font-size: 13px;" onclick="openAddIndicatorModal('${pillar.id}', ${pillarIndicators.length + 1})">+ Add Indicator to This Pillar</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function togglePillar(idx) {
+      const indicators = document.getElementById(`indicators-${idx}`);
+      const toggle = document.getElementById(`toggle-${idx}`);
+      indicators.classList.toggle('show');
+      toggle.classList.toggle('expanded');
+    }
+
+    async function loadInstitutionTypes() {
+      try {
+        const res = await fetch('/api/institutional-inspections/institution-types');
+        institutionTypes = await res.json();
+        renderTypes();
+      } catch (e) {
+        console.error('Failed to load institution types:', e);
+      }
+    }
+
+    function renderTypes() {
+      const tbody = document.getElementById('typesTable');
+      if (!institutionTypes.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No institution types configured</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = institutionTypes.map(t => `
+        <tr>
+          <td><strong>${t.name}</strong></td>
+          <td>${t.code}</td>
+          <td>${t.category || '-'}</td>
+          <td><span class="badge ${t.isActive ? 'badge-active' : 'badge-inactive'}">${t.isActive ? 'Active' : 'Inactive'}</span></td>
+          <td>
+            <button class="btn" style="padding: 4px 8px; font-size: 12px;" onclick="editType('${t.id}')">Edit</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadConfig() {
+      try {
+        const res = await fetch('/api/admin/institutional-inspection/config');
+        config = await res.json();
+        renderConfig();
+      } catch (e) {
+        console.error('Failed to load config:', e);
+      }
+    }
+
+    function renderConfig() {
+      const container = document.getElementById('configContainer');
+      const thresholdConfigs = config.filter(c => 
+        c.configKey.includes('risk') || c.configKey.includes('threshold') || c.configKey.includes('score')
+      );
+
+      container.innerHTML = thresholdConfigs.map(c => `
+        <div class="config-row">
+          <div>
+            <div class="config-key">${formatConfigKey(c.configKey)}</div>
+            <div style="color: #6b7280; font-size: 12px;">${c.description || ''}</div>
+          </div>
+          <div class="config-value">
+            <input type="${c.configType === 'number' ? 'number' : 'text'}" 
+                   class="form-input config-input" 
+                   value="${c.configValue}" 
+                   id="config-${c.configKey}"
+                   onchange="updateConfig('${c.configKey}')">
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function formatConfigKey(key) {
+      return key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+
+    async function updateConfig(key) {
+      const value = document.getElementById(`config-${key}`).value;
+      try {
+        await fetch(`/api/admin/institutional-inspection/config/${key}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ value })
+        });
+        alert('Configuration updated');
+      } catch (e) {
+        alert('Failed to update configuration');
+      }
+    }
+
+    // Reset to Defaults
+    async function resetToDefaults() {
+      const confirmed = confirm(
+        'WARNING: This will delete ALL current pillars and indicators and restore the standard FSSAI framework with 7 pillars and 35 indicators.\n\n' +
+        'Any custom pillars or indicators you have added will be permanently deleted.\n\n' +
+        'Are you sure you want to reset to defaults?'
+      );
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch('/api/admin/institutional-inspection/reset-defaults', { method: 'POST' });
+        if (!res.ok) throw new Error('Failed to reset');
+        alert('Successfully reset to 7 FSSAI pillars and 35 indicators');
+        await Promise.all([loadPillars(), loadIndicators()]);
+      } catch (e) {
+        alert('Failed to reset: ' + e.message);
+      }
+    }
+
+    // Pillar Management
+    function openAddPillarModal() {
+      document.getElementById('editPillarId').value = '';
+      document.getElementById('pillarNumber').value = pillars.length + 1;
+      document.getElementById('pillarName').value = '';
+      document.getElementById('pillarDescription').value = '';
+      document.getElementById('pillarModalTitle').textContent = 'Add New Pillar';
+      document.getElementById('deletePillarBtn').style.display = 'none';
+      document.getElementById('pillarModal').classList.add('show');
+    }
+
+    function editPillar(id) {
+      const pillar = pillars.find(p => p.id === id);
+      if (!pillar) return;
+
+      document.getElementById('editPillarId').value = id;
+      document.getElementById('pillarNumber').value = pillar.pillarNumber;
+      document.getElementById('pillarName').value = pillar.name;
+      document.getElementById('pillarDescription').value = pillar.description || '';
+      document.getElementById('pillarModalTitle').textContent = 'Edit Pillar';
+      document.getElementById('deletePillarBtn').style.display = 'inline-flex';
+      document.getElementById('pillarModal').classList.add('show');
+    }
+
+    function closePillarModal() {
+      document.getElementById('pillarModal').classList.remove('show');
+    }
+
+    async function savePillar() {
+      const id = document.getElementById('editPillarId').value;
+      const data = {
+        pillarNumber: parseInt(document.getElementById('pillarNumber').value),
+        name: document.getElementById('pillarName').value,
+        description: document.getElementById('pillarDescription').value
+      };
+
+      if (!data.name) {
+        alert('Pillar name is required');
+        return;
+      }
+
+      const url = id 
+        ? `/api/admin/institutional-inspection/pillars/${id}`
+        : '/api/admin/institutional-inspection/pillars';
+
+      try {
+        const res = await fetch(url, {
+          method: id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Failed to save');
+        closePillarModal();
+        await loadPillars();
+        alert(id ? 'Pillar updated' : 'Pillar created');
+      } catch (e) {
+        alert('Failed to save pillar: ' + e.message);
+      }
+    }
+
+    async function deletePillar() {
+      const id = document.getElementById('editPillarId').value;
+      if (!id) return;
+
+      const pillarIndicators = indicators.filter(i => i.pillarId === id);
+      const msg = pillarIndicators.length > 0 
+        ? `This pillar has ${pillarIndicators.length} indicators that will also be deleted. Are you sure?`
+        : 'Are you sure you want to delete this pillar?';
+      
+      if (!confirm(msg)) return;
+
+      try {
+        await fetch(`/api/admin/institutional-inspection/pillars/${id}`, { method: 'DELETE' });
+        closePillarModal();
+        await Promise.all([loadPillars(), loadIndicators()]);
+        alert('Pillar deleted');
+      } catch (e) {
+        alert('Failed to delete pillar');
+      }
+    }
+
+    // Indicator Management
+    function openAddIndicatorModal(pillarId, indicatorNum) {
+      document.getElementById('editIndicatorId').value = '';
+      document.getElementById('indicatorPillarId').value = pillarId;
+      document.getElementById('indicatorNumber').value = indicatorNum;
+      document.getElementById('indicatorName').value = '';
+      document.getElementById('indicatorRiskLevel').value = 'medium';
+      document.getElementById('indicatorWeight').value = 2;
+      document.getElementById('indicatorDescription').value = '';
+      document.getElementById('indicatorModalTitle').textContent = 'Add New Indicator';
+      document.getElementById('deleteIndicatorBtn').style.display = 'none';
+      document.getElementById('indicatorModal').classList.add('show');
+    }
+
+    function editIndicator(id) {
+      const ind = indicators.find(i => i.id === id);
+      if (!ind) return;
+
+      document.getElementById('editIndicatorId').value = id;
+      document.getElementById('indicatorPillarId').value = ind.pillarId;
+      document.getElementById('indicatorNumber').value = ind.indicatorNumber;
+      document.getElementById('indicatorName').value = ind.name;
+      document.getElementById('indicatorRiskLevel').value = ind.riskLevel;
+      document.getElementById('indicatorWeight').value = ind.weight;
+      document.getElementById('indicatorDescription').value = ind.description || '';
+      document.getElementById('indicatorModalTitle').textContent = 'Edit Indicator';
+      document.getElementById('deleteIndicatorBtn').style.display = 'inline-flex';
+      document.getElementById('indicatorModal').classList.add('show');
+    }
+
+    function closeIndicatorModal() {
+      document.getElementById('indicatorModal').classList.remove('show');
+    }
+
+    function updateWeightFromRisk() {
+      const level = document.getElementById('indicatorRiskLevel').value;
+      const weights = { high: 3, medium: 2, low: 1 };
+      document.getElementById('indicatorWeight').value = weights[level];
+    }
+
+    async function saveIndicator() {
+      const id = document.getElementById('editIndicatorId').value;
+      const pillarId = document.getElementById('indicatorPillarId').value;
+      const data = {
+        pillarId: pillarId,
+        indicatorNumber: parseInt(document.getElementById('indicatorNumber').value),
+        name: document.getElementById('indicatorName').value,
+        riskLevel: document.getElementById('indicatorRiskLevel').value,
+        weight: parseInt(document.getElementById('indicatorWeight').value),
+        description: document.getElementById('indicatorDescription').value
+      };
+
+      if (!data.name) {
+        alert('Indicator name is required');
+        return;
+      }
+
+      const url = id 
+        ? `/api/admin/institutional-inspection/indicators/${id}`
+        : '/api/admin/institutional-inspection/indicators';
+
+      try {
+        const res = await fetch(url, {
+          method: id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Failed to save');
+        closeIndicatorModal();
+        await loadIndicators();
+        alert(id ? 'Indicator updated' : 'Indicator created');
+      } catch (e) {
+        alert('Failed to save indicator: ' + e.message);
+      }
+    }
+
+    async function deleteIndicator() {
+      const id = document.getElementById('editIndicatorId').value;
+      if (!id) return;
+
+      if (!confirm('Are you sure you want to delete this indicator?')) return;
+
+      try {
+        await fetch(`/api/admin/institutional-inspection/indicators/${id}`, { method: 'DELETE' });
+        closeIndicatorModal();
+        await loadIndicators();
+        alert('Indicator deleted');
+      } catch (e) {
+        alert('Failed to delete indicator');
+      }
+    }
+
+    function openAddTypeModal() {
+      document.getElementById('editTypeId').value = '';
+      document.getElementById('typeName').value = '';
+      document.getElementById('typeCode').value = '';
+      document.getElementById('typeCategory').value = 'education';
+      document.getElementById('typeDescription').value = '';
+      document.getElementById('typeModalTitle').textContent = 'Add Institution Type';
+      document.getElementById('typeModal').classList.add('show');
+    }
+
+    function editType(id) {
+      const t = institutionTypes.find(x => x.id === id);
+      if (!t) return;
+
+      document.getElementById('editTypeId').value = id;
+      document.getElementById('typeName').value = t.name;
+      document.getElementById('typeCode').value = t.code;
+      document.getElementById('typeCategory').value = t.category || 'government';
+      document.getElementById('typeDescription').value = t.description || '';
+      document.getElementById('typeModalTitle').textContent = 'Edit Institution Type';
+      document.getElementById('typeModal').classList.add('show');
+    }
+
+    function closeTypeModal() {
+      document.getElementById('typeModal').classList.remove('show');
+    }
+
+    async function saveType() {
+      const id = document.getElementById('editTypeId').value;
+      const data = {
+        name: document.getElementById('typeName').value,
+        code: document.getElementById('typeCode').value,
+        category: document.getElementById('typeCategory').value,
+        description: document.getElementById('typeDescription').value
+      };
+
+      const url = id 
+        ? `/api/admin/institutional-inspection/institution-types/${id}`
+        : '/api/admin/institutional-inspection/institution-types';
+
+      try {
+        await fetch(url, {
+          method: id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        closeTypeModal();
+        await loadInstitutionTypes();
+        alert(id ? 'Type updated' : 'Type created');
+      } catch (e) {
+        alert('Failed to save institution type');
+      }
+    }
+
+    function logout() {
+      fetch('/api/admin/logout', { method: 'POST' }).then(() => {
+        window.location.href = '/admin';
+      });
+    }
+
+    // Person Types Management
+    async function loadPersonTypes() {
+      try {
+        const res = await fetch('/api/admin/institutional-inspection/person-types');
+        personTypes = await res.json();
+        renderPersonTypes();
+      } catch (e) {
+        console.error('Failed to load person types:', e);
+      }
+    }
+
+    function renderPersonTypes() {
+      const tbody = document.getElementById('personTypesTable');
+      if (!personTypes.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No person types configured. Add one to get started.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = personTypes.map(pt => {
+        const fieldCount = pt.fields ? pt.fields.length : 0;
+        const fieldNames = pt.fields ? pt.fields.map(f => f.label).slice(0, 3).join(', ') + (pt.fields.length > 3 ? '...' : '') : '-';
+        return `
+          <tr>
+            <td><strong>${pt.typeName}</strong><br><small style="color: #6b7280;">${pt.description || ''}</small></td>
+            <td><code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px;">${pt.typeCode}</code></td>
+            <td>${fieldCount} fields<br><small style="color: #6b7280;">${fieldNames}</small></td>
+            <td>${pt.maxCount}</td>
+            <td><span class="badge ${pt.isActive ? 'badge-active' : 'badge-inactive'}">${pt.isActive ? 'Active' : 'Inactive'}</span></td>
+            <td>
+              <button class="btn" style="padding: 4px 8px; font-size: 12px;" onclick="editPersonType('${pt.id}')">Edit</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openAddPersonTypeModal() {
+      document.getElementById('editPersonTypeId').value = '';
+      document.getElementById('personTypeName').value = '';
+      document.getElementById('personTypeCode').value = '';
+      document.getElementById('personTypeDescription').value = '';
+      document.getElementById('personTypeDisplayOrder').value = personTypes.length + 1;
+      document.getElementById('personTypeMaxCount').value = 1;
+      document.getElementById('personTypeIsActive').value = 'true';
+      document.getElementById('personTypeModalTitle').textContent = 'Add Person Type';
+      document.getElementById('deletePersonTypeBtn').style.display = 'none';
+      
+      personTypeFields = [
+        { key: 'fullName', label: 'Full Name', type: 'text', required: true, showInWatermark: true }
+      ];
+      renderPersonTypeFields();
+      
+      document.getElementById('personTypeModal').classList.add('show');
+    }
+
+    function editPersonType(id) {
+      const pt = personTypes.find(x => x.id === id);
+      if (!pt) return;
+
+      document.getElementById('editPersonTypeId').value = id;
+      document.getElementById('personTypeName').value = pt.typeName;
+      document.getElementById('personTypeCode').value = pt.typeCode;
+      document.getElementById('personTypeDescription').value = pt.description || '';
+      document.getElementById('personTypeDisplayOrder').value = pt.displayOrder;
+      document.getElementById('personTypeMaxCount').value = pt.maxCount;
+      document.getElementById('personTypeIsActive').value = pt.isActive ? 'true' : 'false';
+      document.getElementById('personTypeModalTitle').textContent = 'Edit Person Type';
+      document.getElementById('deletePersonTypeBtn').style.display = 'inline-flex';
+      
+      personTypeFields = pt.fields ? [...pt.fields] : [];
+      renderPersonTypeFields();
+      
+      document.getElementById('personTypeModal').classList.add('show');
+    }
+
+    function closePersonTypeModal() {
+      document.getElementById('personTypeModal').classList.remove('show');
+    }
+
+    function renderPersonTypeFields() {
+      const container = document.getElementById('personTypeFieldsContainer');
+      if (!personTypeFields.length) {
+        container.innerHTML = '<div style="text-align: center; color: #9ca3af; padding: 20px;">No fields configured. Click "Add Field" to create one.</div>';
+        return;
+      }
+
+      container.innerHTML = personTypeFields.map((field, idx) => `
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto auto auto auto; gap: 8px; align-items: center; padding: 10px; background: white; border-radius: 6px; margin-bottom: 8px; border: 1px solid #e5e7eb;">
+          <input type="text" class="form-input" style="font-size: 13px; padding: 6px 10px;" value="${field.label}" placeholder="Label" onchange="updatePersonTypeField(${idx}, 'label', this.value)">
+          <input type="text" class="form-input" style="font-size: 13px; padding: 6px 10px;" value="${field.key}" placeholder="Key" onchange="updatePersonTypeField(${idx}, 'key', this.value)">
+          <select class="form-select" style="font-size: 13px; padding: 6px 10px;" onchange="updatePersonTypeField(${idx}, 'type', this.value)">
+            <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text</option>
+            <option value="phone" ${field.type === 'phone' ? 'selected' : ''}>Phone</option>
+            <option value="email" ${field.type === 'email' ? 'selected' : ''}>Email</option>
+            <option value="date" ${field.type === 'date' ? 'selected' : ''}>Date</option>
+          </select>
+          <label style="display: flex; align-items: center; gap: 4px; font-size: 12px; white-space: nowrap;">
+            <input type="checkbox" ${field.required ? 'checked' : ''} onchange="updatePersonTypeField(${idx}, 'required', this.checked)"> Req
+          </label>
+          <label style="display: flex; align-items: center; gap: 4px; font-size: 12px; white-space: nowrap;" title="Show in photo watermark">
+            <input type="checkbox" ${field.showInWatermark ? 'checked' : ''} onchange="updatePersonTypeField(${idx}, 'showInWatermark', this.checked)"> WM
+          </label>
+          <button onclick="movePersonTypeField(${idx}, -1)" style="padding: 4px 8px; background: #f3f4f6; border: none; border-radius: 4px; cursor: pointer;" ${idx === 0 ? 'disabled' : ''}>↑</button>
+          <button onclick="removePersonTypeField(${idx})" style="padding: 4px 8px; background: #fee2e2; color: #dc2626; border: none; border-radius: 4px; cursor: pointer;">×</button>
+        </div>
+      `).join('');
+    }
+
+    function addPersonTypeField() {
+      const fieldNum = personTypeFields.length + 1;
+      personTypeFields.push({
+        key: `field${fieldNum}`,
+        label: `Field ${fieldNum}`,
+        type: 'text',
+        required: false,
+        showInWatermark: false
+      });
+      renderPersonTypeFields();
+    }
+
+    function updatePersonTypeField(idx, prop, value) {
+      if (personTypeFields[idx]) {
+        personTypeFields[idx][prop] = value;
+      }
+    }
+
+    function movePersonTypeField(idx, direction) {
+      const newIdx = idx + direction;
+      if (newIdx < 0 || newIdx >= personTypeFields.length) return;
+      const temp = personTypeFields[idx];
+      personTypeFields[idx] = personTypeFields[newIdx];
+      personTypeFields[newIdx] = temp;
+      renderPersonTypeFields();
+    }
+
+    function removePersonTypeField(idx) {
+      personTypeFields.splice(idx, 1);
+      renderPersonTypeFields();
+    }
+
+    async function savePersonType() {
+      const id = document.getElementById('editPersonTypeId').value;
+      const data = {
+        typeName: document.getElementById('personTypeName').value,
+        typeCode: document.getElementById('personTypeCode').value,
+        description: document.getElementById('personTypeDescription').value,
+        displayOrder: parseInt(document.getElementById('personTypeDisplayOrder').value),
+        maxCount: parseInt(document.getElementById('personTypeMaxCount').value),
+        isActive: document.getElementById('personTypeIsActive').value === 'true',
+        fields: personTypeFields
+      };
+
+      if (!data.typeName || !data.typeCode) {
+        alert('Type Name and Code are required');
+        return;
+      }
+
+      const url = id 
+        ? `/api/admin/institutional-inspection/person-types/${id}`
+        : '/api/admin/institutional-inspection/person-types';
+
+      try {
+        const res = await fetch(url, {
+          method: id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (!res.ok) throw new Error('Failed to save');
+        
+        closePersonTypeModal();
+        await loadPersonTypes();
+        alert(id ? 'Person type updated' : 'Person type created');
+      } catch (e) {
+        alert('Failed to save person type: ' + e.message);
+      }
+    }
+
+    async function deletePersonType() {
+      const id = document.getElementById('editPersonTypeId').value;
+      if (!id) return;
+
+      if (!confirm('Are you sure you want to delete this person type? This cannot be undone.')) return;
+
+      try {
+        await fetch(`/api/admin/institutional-inspection/person-types/${id}`, {
+          method: 'DELETE'
+        });
+        closePersonTypeModal();
+        await loadPersonTypes();
+        alert('Person type deleted');
+      } catch (e) {
+        alert('Failed to delete person type');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
