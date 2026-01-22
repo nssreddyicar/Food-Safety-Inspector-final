@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Workflow Management - FSSAI Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .workflow-canvas { min-height: 400px; background: linear-gradient(to right, #f0f4f8 1px, transparent 1px), linear-gradient(to bottom, #f0f4f8 1px, transparent 1px); background-size: 20px 20px; }
+    .node-card { transition: all 0.2s; }
+    .node-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+    .transition-line { stroke-dasharray: 5,5; animation: dash 1s linear infinite; }
+    @keyframes dash { to { stroke-dashoffset: -10; } }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b border-gray-200 px-6 py-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="/admin/dashboard" class="text-gray-600 hover:text-gray-900">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <h1 class="text-xl font-bold text-gray-900">Sample Workflow Management</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="seedDefaultWorkflow()" class="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+          Load Default Workflow
+        </button>
+        <button onclick="showAddNodeModal()" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Add Node
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="p-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Workflow Nodes List -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div class="p-4 border-b border-gray-200">
+            <h2 class="font-semibold text-gray-900">Workflow Nodes</h2>
+            <p class="text-sm text-gray-500">Define each step in the sample lifecycle</p>
+          </div>
+          <div id="nodesList" class="p-4 space-y-3">
+            <div class="text-center py-8 text-gray-500">Loading nodes...</div>
+          </div>
+        </div>
+
+        <!-- Transitions Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mt-6">
+          <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+            <div>
+              <h2 class="font-semibold text-gray-900">Workflow Transitions</h2>
+              <p class="text-sm text-gray-500">Define how samples move between nodes</p>
+            </div>
+            <button onclick="showAddTransitionModal()" class="px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Add Transition
+            </button>
+          </div>
+          <div id="transitionsList" class="p-4 space-y-3">
+            <div class="text-center py-8 text-gray-500">Loading transitions...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workflow Preview -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 sticky top-6">
+          <div class="p-4 border-b border-gray-200">
+            <h2 class="font-semibold text-gray-900">Workflow Preview</h2>
+            <p class="text-sm text-gray-500">Visual representation of the workflow</p>
+          </div>
+          <div id="workflowPreview" class="p-4 workflow-canvas rounded-b-xl">
+            <div class="text-center py-8 text-gray-400">Configure nodes to see preview</div>
+          </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="bg-blue-50 rounded-xl p-4 mt-6 border border-blue-100">
+          <h3 class="font-semibold text-blue-900 mb-2">How It Works</h3>
+          <ul class="text-sm text-blue-800 space-y-2">
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 mt-0.5">1.</span>
+              Create nodes for each step (Sample Lifted, Dispatched, Lab Report, etc.)
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 mt-0.5">2.</span>
+              Define input fields for data collection at each node
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 mt-0.5">3.</span>
+              Link templates to nodes for document generation
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 mt-0.5">4.</span>
+              Create transitions with conditions (e.g., Lab Result = Unsafe)
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Node Modal -->
+  <div id="nodeModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <div class="p-6 border-b border-gray-200">
+        <h2 id="nodeModalTitle" class="text-xl font-bold">Add Workflow Node</h2>
+      </div>
+      <div class="p-6 overflow-y-auto max-h-[60vh] space-y-4">
+        <input type="hidden" id="nodeId">
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Node Name *</label>
+            <input type="text" id="nodeName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Sample Lifted">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+            <input type="number" id="nodePosition" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0" value="0">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <textarea id="nodeDescription" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Describe what happens at this step"></textarea>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Node Type</label>
+            <select id="nodeType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="action">Action</option>
+              <option value="decision">Decision</option>
+              <option value="end">End</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Icon</label>
+            <select id="nodeIcon" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="package">Package</option>
+              <option value="truck">Truck</option>
+              <option value="file-text">File Text</option>
+              <option value="check-circle">Check Circle</option>
+              <option value="alert-triangle">Alert</option>
+              <option value="clock">Clock</option>
+              <option value="shield">Shield</option>
+              <option value="send">Send</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Color</label>
+            <input type="color" id="nodeColor" class="w-full h-10 border border-gray-300 rounded-lg cursor-pointer" value="#1E40AF">
+          </div>
+        </div>
+
+        <div class="flex gap-4">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="isStartNode" class="w-4 h-4 text-blue-600 rounded">
+            <span class="text-sm text-gray-700">Start Node</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="isEndNode" class="w-4 h-4 text-blue-600 rounded">
+            <span class="text-sm text-gray-700">End Node</span>
+          </label>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-sm font-medium text-gray-700">Input Fields</label>
+            <button type="button" onclick="addInputField()" class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Add Field
+            </button>
+          </div>
+          <div id="inputFieldsList" class="border border-gray-200 rounded-lg bg-gray-50 min-h-[60px] max-h-[300px] overflow-y-auto">
+            <div class="text-center py-4 text-gray-400 text-sm" id="noFieldsMessage">No input fields defined</div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Define data fields to collect at this node</p>
+        </div>
+
+        <!-- Input Field Editor (inline) -->
+        <div id="inputFieldEditor" class="hidden border border-blue-200 rounded-lg bg-blue-50 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-medium text-blue-900" id="fieldEditorTitle">Add New Field</h4>
+            <button type="button" onclick="cancelFieldEdit()" class="text-gray-500 hover:text-gray-700">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <input type="hidden" id="editingFieldIndex" value="-1">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">Field Name *</label>
+              <input type="text" id="fieldName" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg" placeholder="e.g., dispatchDate">
+              <p class="text-xs text-gray-400 mt-0.5">Unique identifier (no spaces)</p>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">Label *</label>
+              <input type="text" id="fieldLabel" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg" placeholder="e.g., Dispatch Date">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">Field Type</label>
+              <select id="fieldType" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg" onchange="toggleFieldOptions()">
+                <option value="text">Text (single line)</option>
+                <option value="textarea">Text Area (multi-line)</option>
+                <option value="number">Number</option>
+                <option value="date">Date</option>
+                <option value="time">Time</option>
+                <option value="datetime">Date & Time</option>
+                <option value="select">Dropdown Select</option>
+                <option value="radio">Radio Buttons</option>
+                <option value="checkbox">Checkbox</option>
+                <option value="image">Image Upload</option>
+                <option value="file">File Upload</option>
+              </select>
+            </div>
+            <div class="flex items-end gap-4">
+              <label class="flex items-center gap-2 text-sm">
+                <input type="checkbox" id="fieldRequired" class="w-4 h-4 text-blue-600 rounded">
+                <span class="text-gray-700">Required</span>
+              </label>
+            </div>
+          </div>
+          <div id="fieldOptionsContainer" class="hidden">
+            <label class="block text-xs font-medium text-gray-700 mb-1">Options (one per line)</label>
+            <textarea id="fieldOptions" rows="3" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg font-mono" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+            <p class="text-xs text-gray-400 mt-0.5">Enter each option on a new line</p>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Placeholder / Help Text</label>
+            <input type="text" id="fieldPlaceholder" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg" placeholder="e.g., Enter the dispatch date">
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="cancelFieldEdit()" class="px-3 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+            <button type="button" onclick="saveField()" class="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Field</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Linked Templates</label>
+          <div id="templateCheckboxes" class="border border-gray-200 rounded-lg p-3 max-h-32 overflow-y-auto space-y-2">
+            <div class="text-sm text-gray-500">Loading templates...</div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Auto-Advance Condition</label>
+          <input type="text" id="nodeAutoAdvance" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., days_elapsed:14">
+          <p class="text-xs text-gray-500 mt-1">Automatically move to next node when condition is met</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Edit Freeze Time</label>
+          <select id="nodeEditFreezeHours" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="0">No freeze (always editable)</option>
+            <option value="6">6 hours after update</option>
+            <option value="12">12 hours after update</option>
+            <option value="24">1 day after update</option>
+            <option value="48" selected>2 days after update</option>
+            <option value="72">3 days after update</option>
+            <option value="168">1 week after update</option>
+            <option value="-1">Never editable (locked immediately)</option>
+          </select>
+          <p class="text-xs text-gray-500 mt-1">How long officers can edit this node after submitting data</p>
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-200 flex justify-end gap-3">
+        <button onclick="closeNodeModal()" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+        <button onclick="saveNode()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Node</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Transition Modal -->
+  <div id="transitionModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden">
+      <div class="p-6 border-b border-gray-200">
+        <h2 id="transitionModalTitle" class="text-xl font-bold">Add Transition</h2>
+      </div>
+      <div class="p-6 overflow-y-auto max-h-[60vh] space-y-4">
+        <input type="hidden" id="transitionId">
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">From Node *</label>
+            <select id="fromNodeId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Select node...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">To Node *</label>
+            <select id="toNodeId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Select node...</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Condition Type</label>
+          <select id="conditionType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="toggleConditionFields()">
+            <option value="always">Always (No Condition)</option>
+            <option value="lab_result">Based on Lab Result</option>
+            <option value="field_value">Based on Field Value</option>
+          </select>
+        </div>
+
+        <div id="conditionFields" class="hidden space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Condition Field</label>
+            <input type="text" id="conditionField" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., labResult">
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Operator</label>
+              <select id="conditionOperator" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="equals">Equals</option>
+                <option value="not_equals">Not Equals</option>
+                <option value="contains">Contains</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Value</label>
+              <input type="text" id="conditionValue" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., unsafe">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Transition Label</label>
+          <input type="text" id="transitionLabel" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., If Unsafe">
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-200 flex justify-end gap-3">
+        <button onclick="closeTransitionModal()" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+        <button onclick="saveTransition()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Save Transition</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let nodes = [];
+    let transitions = [];
+    let templates = [];
+    let currentInputFields = [];
+
+    // Field type icons and labels for display
+    const fieldTypeInfo = {
+      text: { icon: 'T', label: 'Text', color: '#3B82F6' },
+      textarea: { icon: '¶', label: 'Text Area', color: '#8B5CF6' },
+      number: { icon: '#', label: 'Number', color: '#10B981' },
+      date: { icon: '📅', label: 'Date', color: '#F59E0B' },
+      time: { icon: '🕐', label: 'Time', color: '#6366F1' },
+      datetime: { icon: '📆', label: 'Date & Time', color: '#EC4899' },
+      select: { icon: '▼', label: 'Dropdown', color: '#14B8A6' },
+      radio: { icon: '◉', label: 'Radio', color: '#F97316' },
+      checkbox: { icon: '☑', label: 'Checkbox', color: '#84CC16' },
+      image: { icon: '📷', label: 'Image', color: '#06B6D4' },
+      file: { icon: '📎', label: 'File', color: '#78716C' }
+    };
+
+    function renderInputFields() {
+      const container = document.getElementById('inputFieldsList');
+      const noFieldsMsg = document.getElementById('noFieldsMessage');
+      
+      if (currentInputFields.length === 0) {
+        container.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm" id="noFieldsMessage">No input fields defined</div>';
+        return;
+      }
+      
+      container.innerHTML = currentInputFields.map((field, idx) => {
+        const typeInfo = fieldTypeInfo[field.type] || fieldTypeInfo.text;
+        return `
+          <div class="flex items-center gap-2 p-2 bg-white border-b border-gray-100 last:border-b-0 hover:bg-gray-50 group">
+            <div class="flex flex-col gap-0.5">
+              <button onclick="moveField(${idx}, -1)" class="p-0.5 text-gray-400 hover:text-gray-600 ${idx === 0 ? 'opacity-30 cursor-not-allowed' : ''}" ${idx === 0 ? 'disabled' : ''}>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+              </button>
+              <button onclick="moveField(${idx}, 1)" class="p-0.5 text-gray-400 hover:text-gray-600 ${idx === currentInputFields.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}" ${idx === currentInputFields.length - 1 ? 'disabled' : ''}>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+            </div>
+            <div class="w-7 h-7 rounded flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style="background-color: ${typeInfo.color}">
+              ${typeInfo.icon}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="font-medium text-gray-900 text-sm truncate">${field.label}</span>
+                ${field.required ? '<span class="text-red-500 text-xs">*</span>' : ''}
+                <span class="text-xs text-gray-400">${typeInfo.label}</span>
+              </div>
+              <div class="text-xs text-gray-500 truncate">${field.name}${field.options ? ' • ' + field.options.length + ' options' : ''}</div>
+            </div>
+            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button onclick="editInputField(${idx})" class="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              <button onclick="deleteInputField(${idx})" class="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function addInputField() {
+      document.getElementById('editingFieldIndex').value = '-1';
+      document.getElementById('fieldEditorTitle').textContent = 'Add New Field';
+      document.getElementById('fieldName').value = '';
+      document.getElementById('fieldLabel').value = '';
+      document.getElementById('fieldType').value = 'text';
+      document.getElementById('fieldRequired').checked = false;
+      document.getElementById('fieldOptions').value = '';
+      document.getElementById('fieldPlaceholder').value = '';
+      toggleFieldOptions();
+      document.getElementById('inputFieldEditor').classList.remove('hidden');
+    }
+
+    function editInputField(idx) {
+      const field = currentInputFields[idx];
+      if (!field) return;
+      document.getElementById('editingFieldIndex').value = idx.toString();
+      document.getElementById('fieldEditorTitle').textContent = 'Edit Field';
+      document.getElementById('fieldName').value = field.name || '';
+      document.getElementById('fieldLabel').value = field.label || '';
+      document.getElementById('fieldType').value = field.type || 'text';
+      document.getElementById('fieldRequired').checked = field.required || false;
+      document.getElementById('fieldOptions').value = (field.options || []).join('\n');
+      document.getElementById('fieldPlaceholder').value = field.placeholder || '';
+      toggleFieldOptions();
+      document.getElementById('inputFieldEditor').classList.remove('hidden');
+    }
+
+    function deleteInputField(idx) {
+      if (!confirm('Delete this field?')) return;
+      currentInputFields.splice(idx, 1);
+      renderInputFields();
+    }
+
+    function moveField(idx, direction) {
+      const newIdx = idx + direction;
+      if (newIdx < 0 || newIdx >= currentInputFields.length) return;
+      const temp = currentInputFields[idx];
+      currentInputFields[idx] = currentInputFields[newIdx];
+      currentInputFields[newIdx] = temp;
+      renderInputFields();
+    }
+
+    function toggleFieldOptions() {
+      const type = document.getElementById('fieldType').value;
+      const container = document.getElementById('fieldOptionsContainer');
+      if (type === 'select' || type === 'radio') {
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    function cancelFieldEdit() {
+      document.getElementById('inputFieldEditor').classList.add('hidden');
+    }
+
+    function saveField() {
+      const name = document.getElementById('fieldName').value.trim();
+      const label = document.getElementById('fieldLabel').value.trim();
+      const type = document.getElementById('fieldType').value;
+      const required = document.getElementById('fieldRequired').checked;
+      const placeholder = document.getElementById('fieldPlaceholder').value.trim();
+      const optionsStr = document.getElementById('fieldOptions').value.trim();
+      
+      if (!name) {
+        alert('Field name is required');
+        return;
+      }
+      if (!label) {
+        alert('Field label is required');
+        return;
+      }
+      // Validate name (no spaces, alphanumeric + underscore)
+      if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)) {
+        alert('Field name must start with a letter and contain only letters, numbers, and underscores');
+        return;
+      }
+      
+      const field = { name, label, type, required };
+      if (placeholder) field.placeholder = placeholder;
+      if (type === 'select' || type === 'radio') {
+        const options = optionsStr.split('\n').map(o => o.trim()).filter(o => o);
+        if (options.length === 0) {
+          alert('Please add at least one option for ' + type + ' field');
+          return;
+        }
+        field.options = options;
+      }
+      
+      const editIdx = parseInt(document.getElementById('editingFieldIndex').value);
+      if (editIdx >= 0) {
+        currentInputFields[editIdx] = field;
+      } else {
+        // Check for duplicate name
+        if (currentInputFields.some(f => f.name === name)) {
+          alert('A field with this name already exists');
+          return;
+        }
+        currentInputFields.push(field);
+      }
+      
+      renderInputFields();
+      cancelFieldEdit();
+    }
+
+    function getInputFieldsForSave() {
+      return currentInputFields;
+    }
+
+    async function loadData() {
+      try {
+        const [nodesRes, transitionsRes, templatesRes] = await Promise.all([
+          fetch('/api/admin/workflow/nodes'),
+          fetch('/api/admin/workflow/transitions'),
+          fetch('/api/templates')
+        ]);
+        nodes = await nodesRes.json();
+        transitions = await transitionsRes.json();
+        templates = await templatesRes.json();
+        renderNodes();
+        renderTransitions();
+        renderPreview();
+        renderTemplateCheckboxes();
+        populateNodeSelects();
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    }
+
+    function renderNodes() {
+      const container = document.getElementById('nodesList');
+      if (nodes.length === 0) {
+        container.innerHTML = '<div class="text-center py-8 text-gray-500">No workflow nodes configured. Click "Add Node" to create the first step.</div>';
+        return;
+      }
+      container.innerHTML = nodes.map(node => `
+        <div class="node-card border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: ${node.color}20; color: ${node.color}">
+                <span class="text-lg font-bold">${node.position}</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="font-semibold text-gray-900">${node.name}</h3>
+                  ${node.isStartNode ? '<span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">Start</span>' : ''}
+                  ${node.isEndNode ? '<span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">End</span>' : ''}
+                  <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">${node.nodeType}</span>
+                  <span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">${getFreezeLabel(node.editFreezeHours ?? 48)}</span>
+                </div>
+                <p class="text-sm text-gray-500">${node.description || 'No description'}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="editNode('${node.id}')" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              <button onclick="deleteNode('${node.id}')" class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+          ${(node.templateIds && node.templateIds.length > 0) ? `
+            <div class="mt-3 pt-3 border-t border-gray-100">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs text-gray-500">Templates:</span>
+                ${node.templateIds.map(tid => {
+                  const t = templates.find(temp => temp.id === tid);
+                  return t ? `<span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded">${t.name}</span>` : '';
+                }).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    function renderTransitions() {
+      const container = document.getElementById('transitionsList');
+      if (transitions.length === 0) {
+        container.innerHTML = '<div class="text-center py-8 text-gray-500">No transitions configured. Add transitions to connect nodes.</div>';
+        return;
+      }
+      container.innerHTML = transitions.map(t => {
+        const fromNode = nodes.find(n => n.id === t.fromNodeId);
+        const toNode = nodes.find(n => n.id === t.toNodeId);
+        return `
+          <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
+            <div class="flex items-center gap-3">
+              <span class="font-medium text-gray-900">${fromNode?.name || 'Unknown'}</span>
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              <span class="font-medium text-gray-900">${toNode?.name || 'Unknown'}</span>
+              ${t.conditionType !== 'always' ? `<span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded">${t.label || t.conditionType}</span>` : '<span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">Always</span>'}
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="editTransition('${t.id}')" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              <button onclick="deleteTransition('${t.id}')" class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderPreview() {
+      const container = document.getElementById('workflowPreview');
+      if (nodes.length === 0) {
+        container.innerHTML = '<div class="text-center py-8 text-gray-400">Configure nodes to see preview</div>';
+        return;
+      }
+      const sortedNodes = [...nodes].sort((a, b) => a.position - b.position);
+      container.innerHTML = `
+        <div class="space-y-4">
+          ${sortedNodes.map((node, idx) => `
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background-color: ${node.color}">${idx + 1}</div>
+              <div class="flex-1 bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+                <div class="font-medium text-gray-900 text-sm">${node.name}</div>
+                <div class="text-xs text-gray-500">${node.nodeType}</div>
+              </div>
+            </div>
+            ${idx < sortedNodes.length - 1 ? '<div class="ml-4 w-0.5 h-6 bg-gray-300"></div>' : ''}
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderTemplateCheckboxes() {
+      const container = document.getElementById('templateCheckboxes');
+      if (templates.length === 0) {
+        container.innerHTML = '<div class="text-sm text-gray-500">No templates available</div>';
+        return;
+      }
+      container.innerHTML = templates.map(t => `
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="template-checkbox w-4 h-4 text-blue-600 rounded" value="${t.id}">
+          <span class="text-sm text-gray-700">${t.name}</span>
+        </label>
+      `).join('');
+    }
+
+    function populateNodeSelects() {
+      const fromSelect = document.getElementById('fromNodeId');
+      const toSelect = document.getElementById('toNodeId');
+      const options = nodes.map(n => `<option value="${n.id}">${n.name}</option>`).join('');
+      fromSelect.innerHTML = '<option value="">Select node...</option>' + options;
+      toSelect.innerHTML = '<option value="">Select node...</option>' + options;
+    }
+
+    function showAddNodeModal() {
+      document.getElementById('nodeModalTitle').textContent = 'Add Workflow Node';
+      document.getElementById('nodeId').value = '';
+      document.getElementById('nodeName').value = '';
+      document.getElementById('nodeDescription').value = '';
+      document.getElementById('nodePosition').value = nodes.length;
+      document.getElementById('nodeType').value = 'action';
+      document.getElementById('nodeIcon').value = 'package';
+      document.getElementById('nodeColor').value = '#1E40AF';
+      document.getElementById('isStartNode').checked = false;
+      document.getElementById('isEndNode').checked = false;
+      currentInputFields = [];
+      renderInputFields();
+      document.getElementById('inputFieldEditor').classList.add('hidden');
+      document.getElementById('nodeAutoAdvance').value = '';
+      document.getElementById('nodeEditFreezeHours').value = '48';
+      document.querySelectorAll('.template-checkbox').forEach(cb => cb.checked = false);
+      document.getElementById('nodeModal').classList.remove('hidden');
+      document.getElementById('nodeModal').classList.add('flex');
+    }
+
+    function getFreezeLabel(hours) {
+      if (hours === 0) return 'Always editable';
+      if (hours === -1) return 'Never editable';
+      if (hours < 24) return hours + 'h freeze';
+      if (hours === 24) return '1 day freeze';
+      if (hours === 48) return '2 days freeze';
+      if (hours === 72) return '3 days freeze';
+      if (hours === 168) return '1 week freeze';
+      return (hours / 24) + ' days freeze';
+    }
+
+    function editNode(id) {
+      const node = nodes.find(n => n.id === id);
+      if (!node) return;
+      document.getElementById('nodeModalTitle').textContent = 'Edit Workflow Node';
+      document.getElementById('nodeId').value = node.id;
+      document.getElementById('nodeName').value = node.name || '';
+      document.getElementById('nodeDescription').value = node.description || '';
+      document.getElementById('nodePosition').value = node.position || 0;
+      document.getElementById('nodeType').value = node.nodeType || 'action';
+      document.getElementById('nodeIcon').value = node.icon || 'package';
+      document.getElementById('nodeColor').value = node.color || '#1E40AF';
+      document.getElementById('isStartNode').checked = node.isStartNode || false;
+      document.getElementById('isEndNode').checked = node.isEndNode || false;
+      currentInputFields = node.inputFields ? JSON.parse(JSON.stringify(node.inputFields)) : [];
+      renderInputFields();
+      document.getElementById('inputFieldEditor').classList.add('hidden');
+      document.getElementById('nodeAutoAdvance').value = node.autoAdvanceCondition || '';
+      document.getElementById('nodeEditFreezeHours').value = node.editFreezeHours ?? 48;
+      document.querySelectorAll('.template-checkbox').forEach(cb => {
+        cb.checked = node.templateIds && node.templateIds.includes(cb.value);
+      });
+      document.getElementById('nodeModal').classList.remove('hidden');
+      document.getElementById('nodeModal').classList.add('flex');
+    }
+
+    function closeNodeModal() {
+      document.getElementById('nodeModal').classList.add('hidden');
+      document.getElementById('nodeModal').classList.remove('flex');
+      document.getElementById('inputFieldEditor').classList.add('hidden');
+      currentInputFields = [];
+    }
+
+    async function saveNode() {
+      const id = document.getElementById('nodeId').value;
+      const selectedTemplates = Array.from(document.querySelectorAll('.template-checkbox:checked')).map(cb => cb.value);
+      const data = {
+        name: document.getElementById('nodeName').value,
+        description: document.getElementById('nodeDescription').value,
+        position: parseInt(document.getElementById('nodePosition').value) || 0,
+        nodeType: document.getElementById('nodeType').value,
+        icon: document.getElementById('nodeIcon').value,
+        color: document.getElementById('nodeColor').value,
+        isStartNode: document.getElementById('isStartNode').checked,
+        isEndNode: document.getElementById('isEndNode').checked,
+        inputFields: currentInputFields,
+        templateIds: selectedTemplates,
+        autoAdvanceCondition: document.getElementById('nodeAutoAdvance').value || null,
+        editFreezeHours: parseInt(document.getElementById('nodeEditFreezeHours').value),
+        status: 'active'
+      };
+      try {
+        const url = id ? `/api/admin/workflow/nodes/${id}` : '/api/admin/workflow/nodes';
+        const method = id ? 'PUT' : 'POST';
+        await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+        closeNodeModal();
+        loadData();
+      } catch (error) {
+        alert('Failed to save node');
+      }
+    }
+
+    async function deleteNode(id) {
+      if (!confirm('Delete this node? This will also remove related transitions.')) return;
+      try {
+        await fetch(`/api/admin/workflow/nodes/${id}`, { method: 'DELETE' });
+        loadData();
+      } catch (error) {
+        alert('Failed to delete node');
+      }
+    }
+
+    function showAddTransitionModal() {
+      document.getElementById('transitionModalTitle').textContent = 'Add Transition';
+      document.getElementById('transitionId').value = '';
+      document.getElementById('fromNodeId').value = '';
+      document.getElementById('toNodeId').value = '';
+      document.getElementById('conditionType').value = 'always';
+      document.getElementById('conditionField').value = '';
+      document.getElementById('conditionOperator').value = 'equals';
+      document.getElementById('conditionValue').value = '';
+      document.getElementById('transitionLabel').value = '';
+      toggleConditionFields();
+      document.getElementById('transitionModal').classList.remove('hidden');
+      document.getElementById('transitionModal').classList.add('flex');
+    }
+
+    function editTransition(id) {
+      const t = transitions.find(tr => tr.id === id);
+      if (!t) return;
+      document.getElementById('transitionModalTitle').textContent = 'Edit Transition';
+      document.getElementById('transitionId').value = t.id;
+      document.getElementById('fromNodeId').value = t.fromNodeId;
+      document.getElementById('toNodeId').value = t.toNodeId;
+      document.getElementById('conditionType').value = t.conditionType || 'always';
+      document.getElementById('conditionField').value = t.conditionField || '';
+      document.getElementById('conditionOperator').value = t.conditionOperator || 'equals';
+      document.getElementById('conditionValue').value = t.conditionValue || '';
+      document.getElementById('transitionLabel').value = t.label || '';
+      toggleConditionFields();
+      document.getElementById('transitionModal').classList.remove('hidden');
+      document.getElementById('transitionModal').classList.add('flex');
+    }
+
+    function closeTransitionModal() {
+      document.getElementById('transitionModal').classList.add('hidden');
+      document.getElementById('transitionModal').classList.remove('flex');
+    }
+
+    function toggleConditionFields() {
+      const type = document.getElementById('conditionType').value;
+      const fields = document.getElementById('conditionFields');
+      if (type === 'always') {
+        fields.classList.add('hidden');
+      } else {
+        fields.classList.remove('hidden');
+        if (type === 'lab_result') {
+          document.getElementById('conditionField').value = 'labResult';
+        }
+      }
+    }
+
+    async function saveTransition() {
+      const id = document.getElementById('transitionId').value;
+      const data = {
+        fromNodeId: document.getElementById('fromNodeId').value,
+        toNodeId: document.getElementById('toNodeId').value,
+        conditionType: document.getElementById('conditionType').value,
+        conditionField: document.getElementById('conditionField').value || null,
+        conditionOperator: document.getElementById('conditionOperator').value || null,
+        conditionValue: document.getElementById('conditionValue').value || null,
+        label: document.getElementById('transitionLabel').value || null,
+        status: 'active'
+      };
+      if (!data.fromNodeId || !data.toNodeId) {
+        alert('Please select both From and To nodes');
+        return;
+      }
+      try {
+        const url = id ? `/api/admin/workflow/transitions/${id}` : '/api/admin/workflow/transitions';
+        const method = id ? 'PUT' : 'POST';
+        await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+        closeTransitionModal();
+        loadData();
+      } catch (error) {
+        alert('Failed to save transition');
+      }
+    }
+
+    async function deleteTransition(id) {
+      if (!confirm('Delete this transition?')) return;
+      try {
+        await fetch(`/api/admin/workflow/transitions/${id}`, { method: 'DELETE' });
+        loadData();
+      } catch (error) {
+        alert('Failed to delete transition');
+      }
+    }
+
+    async function seedDefaultWorkflow() {
+      if (!confirm('This will create a default sample workflow with standard nodes. Continue?')) return;
+      const defaultNodes = [
+        { 
+          name: 'Sample Lifted', 
+          description: 'Sample collected from FBO premises', 
+          position: 0, 
+          nodeType: 'action', 
+          icon: 'package', 
+          color: '#1E40AF', 
+          isStartNode: true,
+          editFreezeHours: 24,
+          inputFields: [
+            { name: 'liftedDate', type: 'date', label: 'Lifted Date', required: true },
+            { name: 'liftedPlace', type: 'text', label: 'Place of Lifting', required: true },
+            { name: 'liftedImage', type: 'image', label: 'Upload Sample Image' },
+            { name: 'remarks', type: 'textarea', label: 'Remarks' }
+          ] 
+        },
+        { 
+          name: 'Dispatched to Lab', 
+          description: 'Sample sent to laboratory for testing', 
+          position: 1, 
+          nodeType: 'action', 
+          icon: 'truck', 
+          color: '#7C3AED',
+          editFreezeHours: 24,
+          inputFields: [
+            { name: 'dispatchDate', type: 'date', label: 'Dispatch Date', required: true },
+            { name: 'dispatchMode', type: 'select', label: 'Dispatch Mode', options: ['Hand Delivery', 'Courier', 'Speed Post', 'Registered Post'] },
+            { name: 'courierName', type: 'text', label: 'Courier/Carrier Name' },
+            { name: 'trackingNumber', type: 'text', label: 'Tracking Number' },
+            { name: 'dispatchImage', type: 'image', label: 'Dispatch Proof Image' },
+            { name: 'remarks', type: 'textarea', label: 'Remarks' }
+          ] 
+        },
+        { 
+          name: 'Lab Report Received', 
+          description: 'Laboratory analysis completed', 
+          position: 2, 
+          nodeType: 'decision', 
+          icon: 'file-text', 
+          color: '#059669',
+          editFreezeHours: 48,
+          inputFields: [
+            { name: 'labReportDate', type: 'date', label: 'Lab Report Date', required: true },
+            { name: 'labReportNumber', type: 'text', label: 'Lab Report Number', required: true },
+            { name: 'coveringLetterNumber', type: 'text', label: 'Covering Letter Number' },
+            { name: 'coveringLetterDate', type: 'date', label: 'Covering Letter Date' },
+            { name: 'analystName', type: 'text', label: 'Analyst Name' },
+            { name: 'analystOpinion', type: 'textarea', label: 'Analyst Opinion', required: true },
+            { name: 'labResult', type: 'select', label: 'Result', required: true, options: ['notunsafe', 'unsafe', 'substandard', 'misbranded'] },
+            { name: 'labReportImage', type: 'image', label: 'Lab Report Scan' }
+          ] 
+        },
+        { 
+          name: 'Sample Safe - Closed', 
+          description: 'Sample passed all tests, case closed', 
+          position: 3, 
+          nodeType: 'end', 
+          icon: 'check-circle', 
+          color: '#10B981', 
+          isEndNode: true,
+          editFreezeHours: 72,
+          inputFields: [
+            { name: 'closureDate', type: 'date', label: 'Closure Date' },
+            { name: 'closureRemarks', type: 'textarea', label: 'Closure Remarks' }
+          ]
+        },
+        { 
+          name: 'Initiate Prosecution', 
+          description: 'Start prosecution process for unsafe sample', 
+          position: 4, 
+          nodeType: 'action', 
+          icon: 'alert-triangle', 
+          color: '#DC2626',
+          editFreezeHours: 48,
+          inputFields: [
+            { name: 'prosecutionDate', type: 'date', label: 'Prosecution Start Date', required: true },
+            { name: 'caseNumber', type: 'text', label: 'Case Number' },
+            { name: 'courtName', type: 'text', label: 'Court Name' },
+            { name: 'prosecutionRemarks', type: 'textarea', label: 'Prosecution Details' }
+          ] 
+        },
+        { 
+          name: 'Issue Improvement Notice', 
+          description: 'Issue notice for substandard sample', 
+          position: 5, 
+          nodeType: 'action', 
+          icon: 'shield', 
+          color: '#F59E0B',
+          editFreezeHours: 48,
+          inputFields: [
+            { name: 'noticeDate', type: 'date', label: 'Notice Date', required: true },
+            { name: 'noticeNumber', type: 'text', label: 'Notice Number', required: true },
+            { name: 'complianceDeadline', type: 'date', label: 'Compliance Deadline' },
+            { name: 'noticeRemarks', type: 'textarea', label: 'Notice Details' }
+          ] 
+        }
+      ];
+      try {
+        for (const node of defaultNodes) {
+          await fetch('/api/admin/workflow/nodes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(node) });
+        }
+        await loadData();
+        // Create default transitions
+        const createdNodes = nodes;
+        const nodeMap = {};
+        createdNodes.forEach(n => nodeMap[n.name] = n.id);
+        const defaultTransitions = [
+          { fromNodeId: nodeMap['Sample Lifted'], toNodeId: nodeMap['Dispatched to Lab'], conditionType: 'always' },
+          { fromNodeId: nodeMap['Dispatched to Lab'], toNodeId: nodeMap['Lab Report Received'], conditionType: 'always' },
+          { fromNodeId: nodeMap['Lab Report Received'], toNodeId: nodeMap['Sample Safe - Closed'], conditionType: 'lab_result', conditionField: 'labResult', conditionOperator: 'equals', conditionValue: 'notunsafe', label: 'If Not Unsafe' },
+          { fromNodeId: nodeMap['Lab Report Received'], toNodeId: nodeMap['Initiate Prosecution'], conditionType: 'lab_result', conditionField: 'labResult', conditionOperator: 'equals', conditionValue: 'unsafe', label: 'If Unsafe' },
+          { fromNodeId: nodeMap['Lab Report Received'], toNodeId: nodeMap['Issue Improvement Notice'], conditionType: 'lab_result', conditionField: 'labResult', conditionOperator: 'equals', conditionValue: 'substandard', label: 'If Substandard' }
+        ];
+        for (const t of defaultTransitions) {
+          if (t.fromNodeId && t.toNodeId) {
+            await fetch('/api/admin/workflow/transitions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(t) });
+          }
+        }
+        loadData();
+        alert('Default workflow created successfully!');
+      } catch (error) {
+        alert('Failed to create default workflow');
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
