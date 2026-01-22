@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FBO Inspections Admin - Food Safety System</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f3f4f6; min-height: 100vh; }
+    .header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 24px; font-weight: 600; }
+    .header-actions { display: flex; gap: 15px; align-items: center; }
+    .header a { color: white; text-decoration: none; opacity: 0.9; }
+    .header a:hover { opacity: 1; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 30px; }
+    .tabs { display: flex; gap: 5px; background: white; padding: 10px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); flex-wrap: wrap; }
+    .tab { padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 500; color: #6b7280; transition: all 0.2s; }
+    .tab:hover { background: #f3f4f6; }
+    .tab.active { background: #1e40af; color: white; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .card-title { font-size: 18px; font-weight: 600; color: #1f2937; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; font-size: 14px; }
+    .btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .btn-primary { background: #1e40af; color: white; }
+    .btn-primary:hover { background: #1e3a8a; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover { background: #b91c1c; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .stat-value { font-size: 32px; font-weight: 700; color: #1e40af; }
+    .stat-label { color: #6b7280; margin-top: 5px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    th { font-weight: 600; color: #374151; background: #f9fafb; }
+    tr:hover { background: #f9fafb; }
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .badge-active { background: #dcfce7; color: #166534; }
+    .badge-inactive { background: #fee2e2; color: #991b1b; }
+    .badge-high { background: #fee2e2; color: #991b1b; }
+    .badge-medium { background: #fef3c7; color: #92400e; }
+    .badge-low { background: #dbeafe; color: #1e40af; }
+    .badge-critical { background: #7f1d1d; color: white; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; border-radius: 16px; padding: 30px; width: 90%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 500; margin-bottom: 8px; color: #374151; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px; }
+    .empty-state { text-align: center; padding: 40px; color: #6b7280; }
+    .empty-state h3 { margin-bottom: 10px; color: #374151; }
+    .color-preview { width: 24px; height: 24px; border-radius: 4px; display: inline-block; vertical-align: middle; margin-right: 8px; border: 1px solid #e5e7eb; }
+    .checkbox-row { display: flex; align-items: center; gap: 10px; }
+    .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>FBO Inspection Management</h1>
+    <div class="header-actions">
+      <a href="/admin">← Back to Dashboard</a>
+      <span id="adminUser"></span>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('overview')">Overview</div>
+      <div class="tab" onclick="showTab('inspection-types')">Inspection Types</div>
+      <div class="tab" onclick="showTab('deviation-categories')">Deviation Categories</div>
+      <div class="tab" onclick="showTab('action-types')">Action Types</div>
+      <div class="tab" onclick="showTab('form-fields')">Form Fields</div>
+      <div class="tab" onclick="showTab('config')">Configuration</div>
+    </div>
+
+    <div id="overview" class="tab-content active">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalInspections">0</div>
+          <div class="stat-label">Total FBO Inspections</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="draftCount">0</div>
+          <div class="stat-label">Draft</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="submittedCount">0</div>
+          <div class="stat-label">Submitted</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="closedCount">0</div>
+          <div class="stat-label">Closed</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Recent FBO Inspections</h2>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>FBO Name</th>
+              <th>Type</th>
+              <th>Officer</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="recentInspections">
+            <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="inspection-types" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Inspection Types</h2>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn" onclick="resetInspectionTypes()" style="background: #fef3c7; color: #92400e; border: 1px solid #fcd34d;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/></svg>
+              Reset to Defaults
+            </button>
+            <button class="btn btn-primary" onclick="openInspectionTypeModal()">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              Add Inspection Type
+            </button>
+          </div>
+        </div>
+        <p style="color: #6b7280; margin-bottom: 20px;">Configure types of FBO inspections (Routine, Follow-up, Surveillance, etc.)</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Code</th>
+              <th>Sample Required</th>
+              <th>Follow-up</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inspectionTypesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="deviation-categories" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Deviation Categories</h2>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn" onclick="resetDeviationCategories()" style="background: #fef3c7; color: #92400e; border: 1px solid #fcd34d;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/></svg>
+              Reset to Defaults
+            </button>
+            <button class="btn btn-primary" onclick="openDeviationModal()">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              Add Deviation Category
+            </button>
+          </div>
+        </div>
+        <p style="color: #6b7280; margin-bottom: 20px;">Configure categories of deviations found during inspections (Hygiene, Licensing, Labeling, etc.)</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Code</th>
+              <th>Severity</th>
+              <th>Legal Reference</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="deviationCategoriesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="action-types" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Action Types</h2>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn" onclick="resetActionTypes()" style="background: #fef3c7; color: #92400e; border: 1px solid #fcd34d;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/></svg>
+              Reset to Defaults
+            </button>
+            <button class="btn btn-primary" onclick="openActionTypeModal()">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              Add Action Type
+            </button>
+          </div>
+        </div>
+        <p style="color: #6b7280; margin-bottom: 20px;">Configure actions that can be taken during inspections (Warning, Notice, Seizure, etc.)</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Code</th>
+              <th>Severity</th>
+              <th>Follow-up Required</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="actionTypesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="form-fields" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Inspection Form Fields</h2>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-danger" onclick="resetFormFields()">Reset to Defaults</button>
+            <button class="btn btn-primary" onclick="openFormFieldModal()">+ Add Field</button>
+          </div>
+        </div>
+        
+        <div id="formFieldsContainer">
+          <div id="fbo_details_fields" class="field-group">
+            <h3 style="margin: 20px 0 10px; color: #1e40af; border-bottom: 2px solid #1e40af; padding-bottom: 5px;">FBO Details</h3>
+            <table><thead><tr><th>Field Label</th><th>Type</th><th>Required</th><th>System</th><th>Actions</th></tr></thead><tbody id="fboDetailsTable"></tbody></table>
+          </div>
+          <div id="inspection_details_fields" class="field-group">
+            <h3 style="margin: 20px 0 10px; color: #059669; border-bottom: 2px solid #059669; padding-bottom: 5px;">Inspection Details</h3>
+            <table><thead><tr><th>Field Label</th><th>Type</th><th>Required</th><th>System</th><th>Actions</th></tr></thead><tbody id="inspectionDetailsTable"></tbody></table>
+          </div>
+          <div id="findings_fields" class="field-group">
+            <h3 style="margin: 20px 0 10px; color: #d97706; border-bottom: 2px solid #d97706; padding-bottom: 5px;">Findings</h3>
+            <table><thead><tr><th>Field Label</th><th>Type</th><th>Required</th><th>System</th><th>Actions</th></tr></thead><tbody id="findingsTable"></tbody></table>
+          </div>
+          <div id="actions_fields" class="field-group">
+            <h3 style="margin: 20px 0 10px; color: #dc2626; border-bottom: 2px solid #dc2626; padding-bottom: 5px;">Actions Taken</h3>
+            <table><thead><tr><th>Field Label</th><th>Type</th><th>Required</th><th>System</th><th>Actions</th></tr></thead><tbody id="actionsTable"></tbody></table>
+          </div>
+          <div id="witness_fields" class="field-group">
+            <h3 style="margin: 20px 0 10px; color: #0891b2; border-bottom: 2px solid #0891b2; padding-bottom: 5px;">Witness Details</h3>
+            <table><thead><tr><th>Field Label</th><th>Type</th><th>Required</th><th>System</th><th>Actions</th></tr></thead><tbody id="witnessTable"></tbody></table>
+          </div>
+          <div id="samples_fields" class="field-group">
+            <h3 style="margin: 20px 0 10px; color: #be185d; border-bottom: 2px solid #be185d; padding-bottom: 5px;">Sample Collection</h3>
+            <table><thead><tr><th>Field Label</th><th>Type</th><th>Required</th><th>System</th><th>Actions</th></tr></thead><tbody id="samplesTable"></tbody></table>
+          </div>
+          <div id="evidence_fields" class="field-group">
+            <h3 style="margin: 20px 0 10px; color: #7c3aed; border-bottom: 2px solid #7c3aed; padding-bottom: 5px;">Evidence & Documentation</h3>
+            <table><thead><tr><th>Field Label</th><th>Type</th><th>Required</th><th>System</th><th>Actions</th></tr></thead><tbody id="evidenceTable"></tbody></table>
+          </div>
+        </div>
+        
+        <div class="empty-state" id="noFormFields" style="display: none;">
+          <h3>No Form Fields Configured</h3>
+          <p>Click "Reset to Defaults" to load the standard FSSAI inspection form fields.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="config" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">FBO Inspection Configuration</h2>
+          <button class="btn btn-primary" onclick="saveConfig()">Save Changes</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Max Photos per Inspection</label>
+            <input type="number" id="configMaxPhotos" min="1" max="20" value="10">
+          </div>
+          <div class="form-group">
+            <label>Default Follow-up Days</label>
+            <input type="number" id="configFollowupDays" min="1" max="90" value="15">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Require GPS Location</label>
+            <select id="configRequireGps">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Require Officer Photo</label>
+            <select id="configRequirePhoto">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Watermark Text</label>
+          <input type="text" id="configWatermark" placeholder="e.g., FSSAI Official Inspection">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inspection Type Modal -->
+  <div id="inspectionTypeModal" class="modal">
+    <div class="modal-content">
+      <h2 class="modal-title" id="inspectionTypeModalTitle">Add Inspection Type</h2>
+      <input type="hidden" id="editInspectionTypeId">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" id="inspectionTypeName" placeholder="e.g., Routine Inspection">
+        </div>
+        <div class="form-group">
+          <label>Code *</label>
+          <input type="text" id="inspectionTypeCode" placeholder="e.g., ROUTINE">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="inspectionTypeDesc" rows="2" placeholder="Brief description of this inspection type"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Color</label>
+          <input type="color" id="inspectionTypeColor" value="#3B82F6">
+        </div>
+        <div class="form-group">
+          <label>Display Order</label>
+          <input type="number" id="inspectionTypeOrder" min="0" value="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group checkbox-row">
+          <input type="checkbox" id="inspectionTypeRequiresSample">
+          <label for="inspectionTypeRequiresSample" style="margin: 0;">Requires Sample Collection</label>
+        </div>
+        <div class="form-group checkbox-row">
+          <input type="checkbox" id="inspectionTypeRequiresFollowup">
+          <label for="inspectionTypeRequiresFollowup" style="margin: 0;">Requires Follow-up</label>
+        </div>
+      </div>
+      <div class="form-group" id="followupDaysGroup" style="display: none;">
+        <label>Follow-up Days</label>
+        <input type="number" id="inspectionTypeFollowupDays" min="1" max="90" value="15">
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeInspectionTypeModal()">Cancel</button>
+        <button class="btn btn-danger" id="deleteInspectionTypeBtn" style="display: none;" onclick="deleteInspectionType()">Delete</button>
+        <button class="btn btn-primary" onclick="saveInspectionType()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deviation Category Modal -->
+  <div id="deviationModal" class="modal">
+    <div class="modal-content">
+      <h2 class="modal-title" id="deviationModalTitle">Add Deviation Category</h2>
+      <input type="hidden" id="editDeviationId">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" id="deviationName" placeholder="e.g., Hygiene Violation">
+        </div>
+        <div class="form-group">
+          <label>Code *</label>
+          <input type="text" id="deviationCode" placeholder="e.g., HYGIENE">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="deviationDesc" rows="2" placeholder="Brief description"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Severity</label>
+          <select id="deviationSeverity">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Display Order</label>
+          <input type="number" id="deviationOrder" min="0" value="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Legal Reference (FSSAI Act/Rules)</label>
+        <input type="text" id="deviationLegalRef" placeholder="e.g., FSS Act 2006, Section 26">
+      </div>
+      <div class="form-group">
+        <label>Penalty Range</label>
+        <input type="text" id="deviationPenalty" placeholder="e.g., Rs. 25,000 - Rs. 5,00,000">
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeDeviationModal()">Cancel</button>
+        <button class="btn btn-danger" id="deleteDeviationBtn" style="display: none;" onclick="deleteDeviation()">Delete</button>
+        <button class="btn btn-primary" onclick="saveDeviation()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Type Modal -->
+  <div id="actionTypeModal" class="modal">
+    <div class="modal-content">
+      <h2 class="modal-title" id="actionTypeModalTitle">Add Action Type</h2>
+      <input type="hidden" id="editActionTypeId">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" id="actionTypeName" placeholder="e.g., Issue Warning">
+        </div>
+        <div class="form-group">
+          <label>Code *</label>
+          <input type="text" id="actionTypeCode" placeholder="e.g., WARNING">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="actionTypeDesc" rows="2" placeholder="Brief description"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Severity</label>
+          <select id="actionTypeSeverity">
+            <option value="info">Info</option>
+            <option value="warning" selected>Warning</option>
+            <option value="enforcement">Enforcement</option>
+            <option value="legal">Legal</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Color</label>
+          <input type="color" id="actionTypeColor" value="#F59E0B">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Legal Basis</label>
+        <input type="text" id="actionTypeLegalBasis" placeholder="e.g., FSS Act 2006, Section 32">
+      </div>
+      <div class="form-row">
+        <div class="form-group checkbox-row">
+          <input type="checkbox" id="actionTypeRequiresFollowup">
+          <label for="actionTypeRequiresFollowup" style="margin: 0;">Requires Follow-up</label>
+        </div>
+        <div class="form-group" id="actionFollowupDaysGroup">
+          <label>Follow-up Days</label>
+          <input type="number" id="actionTypeFollowupDays" min="1" max="90" value="15">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeActionTypeModal()">Cancel</button>
+        <button class="btn btn-danger" id="deleteActionTypeBtn" style="display: none;" onclick="deleteActionType()">Delete</button>
+        <button class="btn btn-primary" onclick="saveActionType()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Field Modal -->
+  <div id="formFieldModal" class="modal">
+    <div class="modal-content" style="max-width: 650px;">
+      <h2 class="modal-title" id="formFieldModalTitle">Add Form Field</h2>
+      <input type="hidden" id="editFormFieldId">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Field Label *</label>
+          <input type="text" id="formFieldLabel" placeholder="e.g., FBO Name">
+        </div>
+        <div class="form-group">
+          <label>Field Name *</label>
+          <input type="text" id="formFieldName" placeholder="e.g., fbo_name">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Field Type *</label>
+          <select id="formFieldType" onchange="toggleFieldTypeOptions()">
+            <option value="text">Text</option>
+            <option value="textarea">Text Area</option>
+            <option value="number">Number</option>
+            <option value="date">Date</option>
+            <option value="time">Time</option>
+            <option value="phone">Phone</option>
+            <option value="dropdown">Dropdown</option>
+            <option value="checkbox">Checkbox</option>
+            <option value="file">File Upload</option>
+            <option value="location">GPS Location</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Field Group *</label>
+          <select id="formFieldGroup">
+            <option value="fbo_details">FBO Details</option>
+            <option value="inspection_details">Inspection Details</option>
+            <option value="findings">Findings</option>
+            <option value="actions">Actions Taken</option>
+            <option value="witness">Witness Details</option>
+            <option value="samples">Sample Collection</option>
+            <option value="evidence">Evidence & Documentation</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Display Order</label>
+          <input type="number" id="formFieldOrder" min="1" value="1">
+        </div>
+        <div class="form-group checkbox-row" style="margin-top: 30px;">
+          <input type="checkbox" id="formFieldRequired">
+          <label for="formFieldRequired" style="margin: 0;">Required Field</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Placeholder</label>
+        <input type="text" id="formFieldPlaceholder" placeholder="e.g., Enter FBO name">
+      </div>
+      <div class="form-group">
+        <label>Help Text</label>
+        <input type="text" id="formFieldHelpText" placeholder="e.g., Enter the registered business name">
+      </div>
+      <div class="form-group" id="dropdownOptionsGroup" style="display: none;">
+        <label>Dropdown Options (JSON array)</label>
+        <textarea id="formFieldDropdownOptions" rows="3" placeholder='[{"value": "option1", "label": "Option 1"}]'></textarea>
+      </div>
+      <div id="fileSettingsGroup" style="display: none;">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Max Files</label>
+            <input type="number" id="formFieldMaxFiles" min="1" max="20" value="5">
+          </div>
+          <div class="form-group">
+            <label>Max Size (MB)</label>
+            <input type="number" id="formFieldMaxSize" min="1" max="50" value="5">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group checkbox-row">
+            <input type="checkbox" id="formFieldWatermarkEnabled" checked>
+            <label for="formFieldWatermarkEnabled" style="margin: 0;">Enable Watermark</label>
+          </div>
+          <div class="form-group checkbox-row">
+            <input type="checkbox" id="formFieldWatermarkGps" checked>
+            <label for="formFieldWatermarkGps" style="margin: 0;">Show GPS</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeFormFieldModal()">Cancel</button>
+        <button class="btn btn-danger" id="deleteFormFieldBtn" style="display: none;" onclick="deleteFormField()">Delete</button>
+        <button class="btn btn-primary" onclick="saveFormField()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let inspectionTypes = [];
+    let deviationCategories = [];
+    let actionTypes = [];
+    let formFields = [];
+    let config = {};
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      loadAllData();
+    });
+
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/admin/check');
+        const data = await res.json();
+        if (!data.authenticated) {
+          window.location.href = '/admin/login';
+          return;
+        }
+        document.getElementById('adminUser').textContent = data.username || 'Admin';
+      } catch (e) {
+        window.location.href = '/admin/login';
+      }
+    }
+
+    function showTab(tabName) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        t.classList.toggle('active', t.textContent.toLowerCase().includes(tabName.split('-')[0]));
+      });
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+    }
+
+    async function loadAllData() {
+      await Promise.all([
+        loadStats(),
+        loadInspectionTypes(),
+        loadDeviationCategories(),
+        loadActionTypes(),
+        loadFormFields(),
+        loadConfig()
+      ]);
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/inspections?limit=10');
+        const inspections = await res.json();
+        
+        const draft = inspections.filter(i => i.status === 'draft').length;
+        const submitted = inspections.filter(i => i.status === 'submitted').length;
+        const closed = inspections.filter(i => i.status === 'closed').length;
+        
+        document.getElementById('totalInspections').textContent = inspections.length;
+        document.getElementById('draftCount').textContent = draft;
+        document.getElementById('submittedCount').textContent = submitted;
+        document.getElementById('closedCount').textContent = closed;
+
+        renderRecentInspections(inspections.slice(0, 5));
+      } catch (e) {
+        console.error('Failed to load stats:', e);
+      }
+    }
+
+    function renderRecentInspections(inspections) {
+      const tbody = document.getElementById('recentInspections');
+      if (!inspections.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No inspections found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = inspections.map(i => {
+        const fboName = i.fboDetails?.name || 'Unknown FBO';
+        const date = new Date(i.createdAt).toLocaleDateString('en-IN');
+        return `<tr>
+          <td>${fboName}</td>
+          <td>${i.type || 'N/A'}</td>
+          <td>${i.officerId || 'Unassigned'}</td>
+          <td><span class="badge badge-${i.status === 'closed' ? 'active' : 'inactive'}">${i.status}</span></td>
+          <td>${date}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Inspection Types
+    async function loadInspectionTypes() {
+      try {
+        const res = await fetch('/api/admin/fbo-inspection/types');
+        inspectionTypes = await res.json();
+        renderInspectionTypes();
+      } catch (e) {
+        console.error('Failed to load inspection types:', e);
+      }
+    }
+
+    function renderInspectionTypes() {
+      const tbody = document.getElementById('inspectionTypesTable');
+      if (!inspectionTypes.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No inspection types configured. Click "Add Inspection Type" or "Reset to Defaults".</td></tr>';
+        return;
+      }
+      tbody.innerHTML = inspectionTypes.map(t => `
+        <tr>
+          <td><span class="color-preview" style="background: ${t.color}"></span>${t.name}</td>
+          <td><code>${t.code}</code></td>
+          <td>${t.requiresSample ? 'Yes' : 'No'}</td>
+          <td>${t.requiresFollowup ? `Yes (${t.followupDays || 15} days)` : 'No'}</td>
+          <td><span class="badge ${t.isActive ? 'badge-active' : 'badge-inactive'}">${t.isActive ? 'Active' : 'Inactive'}</span></td>
+          <td><button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="editInspectionType('${t.id}')">Edit</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function openInspectionTypeModal() {
+      document.getElementById('editInspectionTypeId').value = '';
+      document.getElementById('inspectionTypeName').value = '';
+      document.getElementById('inspectionTypeCode').value = '';
+      document.getElementById('inspectionTypeDesc').value = '';
+      document.getElementById('inspectionTypeColor').value = '#3B82F6';
+      document.getElementById('inspectionTypeOrder').value = inspectionTypes.length;
+      document.getElementById('inspectionTypeRequiresSample').checked = false;
+      document.getElementById('inspectionTypeRequiresFollowup').checked = false;
+      document.getElementById('inspectionTypeFollowupDays').value = 15;
+      document.getElementById('followupDaysGroup').style.display = 'none';
+      document.getElementById('inspectionTypeModalTitle').textContent = 'Add Inspection Type';
+      document.getElementById('deleteInspectionTypeBtn').style.display = 'none';
+      document.getElementById('inspectionTypeModal').classList.add('show');
+    }
+
+    function editInspectionType(id) {
+      const t = inspectionTypes.find(x => x.id === id);
+      if (!t) return;
+      document.getElementById('editInspectionTypeId').value = id;
+      document.getElementById('inspectionTypeName').value = t.name;
+      document.getElementById('inspectionTypeCode').value = t.code;
+      document.getElementById('inspectionTypeDesc').value = t.description || '';
+      document.getElementById('inspectionTypeColor').value = t.color || '#3B82F6';
+      document.getElementById('inspectionTypeOrder').value = t.displayOrder;
+      document.getElementById('inspectionTypeRequiresSample').checked = t.requiresSample;
+      document.getElementById('inspectionTypeRequiresFollowup').checked = t.requiresFollowup;
+      document.getElementById('inspectionTypeFollowupDays').value = t.followupDays || 15;
+      document.getElementById('followupDaysGroup').style.display = t.requiresFollowup ? 'block' : 'none';
+      document.getElementById('inspectionTypeModalTitle').textContent = 'Edit Inspection Type';
+      document.getElementById('deleteInspectionTypeBtn').style.display = 'inline-flex';
+      document.getElementById('inspectionTypeModal').classList.add('show');
+    }
+
+    function closeInspectionTypeModal() {
+      document.getElementById('inspectionTypeModal').classList.remove('show');
+    }
+
+    document.getElementById('inspectionTypeRequiresFollowup').addEventListener('change', function() {
+      document.getElementById('followupDaysGroup').style.display = this.checked ? 'block' : 'none';
+    });
+
+    async function saveInspectionType() {
+      const id = document.getElementById('editInspectionTypeId').value;
+      const data = {
+        name: document.getElementById('inspectionTypeName').value,
+        code: document.getElementById('inspectionTypeCode').value.toUpperCase(),
+        description: document.getElementById('inspectionTypeDesc').value,
+        color: document.getElementById('inspectionTypeColor').value,
+        displayOrder: parseInt(document.getElementById('inspectionTypeOrder').value),
+        requiresSample: document.getElementById('inspectionTypeRequiresSample').checked,
+        requiresFollowup: document.getElementById('inspectionTypeRequiresFollowup').checked,
+        followupDays: document.getElementById('inspectionTypeRequiresFollowup').checked 
+          ? parseInt(document.getElementById('inspectionTypeFollowupDays').value) : null
+      };
+
+      if (!data.name || !data.code) {
+        alert('Name and Code are required');
+        return;
+      }
+
+      const url = id ? `/api/admin/fbo-inspection/types/${id}` : '/api/admin/fbo-inspection/types';
+      try {
+        const res = await fetch(url, {
+          method: id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Failed to save');
+        closeInspectionTypeModal();
+        await loadInspectionTypes();
+        alert(id ? 'Inspection type updated' : 'Inspection type created');
+      } catch (e) {
+        alert('Failed to save: ' + e.message);
+      }
+    }
+
+    async function deleteInspectionType() {
+      const id = document.getElementById('editInspectionTypeId').value;
+      if (!confirm('Are you sure you want to delete this inspection type?')) return;
+      try {
+        await fetch(`/api/admin/fbo-inspection/types/${id}`, { method: 'DELETE' });
+        closeInspectionTypeModal();
+        await loadInspectionTypes();
+        alert('Inspection type deleted');
+      } catch (e) {
+        alert('Failed to delete');
+      }
+    }
+
+    async function resetInspectionTypes() {
+      if (!confirm('This will reset all inspection types to defaults. Continue?')) return;
+      try {
+        await fetch('/api/admin/fbo-inspection/types/reset', { method: 'POST' });
+        await loadInspectionTypes();
+        alert('Inspection types reset to defaults');
+      } catch (e) {
+        alert('Failed to reset');
+      }
+    }
+
+    // Deviation Categories
+    async function loadDeviationCategories() {
+      try {
+        const res = await fetch('/api/admin/fbo-inspection/deviations');
+        deviationCategories = await res.json();
+        renderDeviationCategories();
+      } catch (e) {
+        console.error('Failed to load deviation categories:', e);
+      }
+    }
+
+    function renderDeviationCategories() {
+      const tbody = document.getElementById('deviationCategoriesTable');
+      if (!deviationCategories.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No deviation categories configured. Click "Add Deviation Category" or "Reset to Defaults".</td></tr>';
+        return;
+      }
+      tbody.innerHTML = deviationCategories.map(d => `
+        <tr>
+          <td>${d.name}</td>
+          <td><code>${d.code}</code></td>
+          <td><span class="badge badge-${d.severity}">${d.severity.toUpperCase()}</span></td>
+          <td>${d.legalReference || '-'}</td>
+          <td><span class="badge ${d.isActive ? 'badge-active' : 'badge-inactive'}">${d.isActive ? 'Active' : 'Inactive'}</span></td>
+          <td><button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="editDeviation('${d.id}')">Edit</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function openDeviationModal() {
+      document.getElementById('editDeviationId').value = '';
+      document.getElementById('deviationName').value = '';
+      document.getElementById('deviationCode').value = '';
+      document.getElementById('deviationDesc').value = '';
+      document.getElementById('deviationSeverity').value = 'medium';
+      document.getElementById('deviationOrder').value = deviationCategories.length;
+      document.getElementById('deviationLegalRef').value = '';
+      document.getElementById('deviationPenalty').value = '';
+      document.getElementById('deviationModalTitle').textContent = 'Add Deviation Category';
+      document.getElementById('deleteDeviationBtn').style.display = 'none';
+      document.getElementById('deviationModal').classList.add('show');
+    }
+
+    function editDeviation(id) {
+      const d = deviationCategories.find(x => x.id === id);
+      if (!d) return;
+      document.getElementById('editDeviationId').value = id;
+      document.getElementById('deviationName').value = d.name;
+      document.getElementById('deviationCode').value = d.code;
+      document.getElementById('deviationDesc').value = d.description || '';
+      document.getElementById('deviationSeverity').value = d.severity;
+      document.getElementById('deviationOrder').value = d.displayOrder;
+      document.getElementById('deviationLegalRef').value = d.legalReference || '';
+      document.getElementById('deviationPenalty').value = d.penaltyRange || '';
+      document.getElementById('deviationModalTitle').textContent = 'Edit Deviation Category';
+      document.getElementById('deleteDeviationBtn').style.display = 'inline-flex';
+      document.getElementById('deviationModal').classList.add('show');
+    }
+
+    function closeDeviationModal() {
+      document.getElementById('deviationModal').classList.remove('show');
+    }
+
+    async function saveDeviation() {
+      const id = document.getElementById('editDeviationId').value;
+      const data = {
+        name: document.getElementById('deviationName').value,
+        code: document.getElementById('deviationCode').value.toUpperCase(),
+        description: document.getElementById('deviationDesc').value,
+        severity: document.getElementById('deviationSeverity').value,
+        displayOrder: parseInt(document.getElementById('deviationOrder').value),
+        legalReference: document.getElementById('deviationLegalRef').value,
+        penaltyRange: document.getElementById('deviationPenalty').value
+      };
+
+      if (!data.name || !data.code) {
+        alert('Name and Code are required');
+        return;
+      }
+
+      const url = id ? `/api/admin/fbo-inspection/deviations/${id}` : '/api/admin/fbo-inspection/deviations';
+      try {
+        const res = await fetch(url, {
+          method: id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Failed to save');
+        closeDeviationModal();
+        await loadDeviationCategories();
+        alert(id ? 'Deviation category updated' : 'Deviation category created');
+      } catch (e) {
+        alert('Failed to save: ' + e.message);
+      }
+    }
+
+    async function deleteDeviation() {
+      const id = document.getElementById('editDeviationId').value;
+      if (!confirm('Are you sure you want to delete this deviation category?')) return;
+      try {
+        await fetch(`/api/admin/fbo-inspection/deviations/${id}`, { method: 'DELETE' });
+        closeDeviationModal();
+        await loadDeviationCategories();
+        alert('Deviation category deleted');
+      } catch (e) {
+        alert('Failed to delete');
+      }
+    }
+
+    async function resetDeviationCategories() {
+      if (!confirm('This will reset all deviation categories to defaults. Continue?')) return;
+      try {
+        await fetch('/api/admin/fbo-inspection/deviations/reset', { method: 'POST' });
+        await loadDeviationCategories();
+        alert('Deviation categories reset to defaults');
+      } catch (e) {
+        alert('Failed to reset');
+      }
+    }
+
+    // Action Types
+    async function loadActionTypes() {
+      try {
+        const res = await fetch('/api/admin/fbo-inspection/actions');
+        actionTypes = await res.json();
+        renderActionTypes();
+      } catch (e) {
+        console.error('Failed to load action types:', e);
+      }
+    }
+
+    function renderActionTypes() {
+      const tbody = document.getElementById('actionTypesTable');
+      if (!actionTypes.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No action types configured. Click "Add Action Type" or "Reset to Defaults".</td></tr>';
+        return;
+      }
+      tbody.innerHTML = actionTypes.map(a => `
+        <tr>
+          <td><span class="color-preview" style="background: ${a.color}"></span>${a.name}</td>
+          <td><code>${a.code}</code></td>
+          <td><span class="badge badge-${a.severity === 'legal' ? 'critical' : a.severity === 'enforcement' ? 'high' : a.severity === 'warning' ? 'medium' : 'low'}">${a.severity.toUpperCase()}</span></td>
+          <td>${a.requiresFollowup ? `Yes (${a.followupDays || 15} days)` : 'No'}</td>
+          <td><span class="badge ${a.isActive ? 'badge-active' : 'badge-inactive'}">${a.isActive ? 'Active' : 'Inactive'}</span></td>
+          <td><button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="editActionType('${a.id}')">Edit</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function openActionTypeModal() {
+      document.getElementById('editActionTypeId').value = '';
+      document.getElementById('actionTypeName').value = '';
+      document.getElementById('actionTypeCode').value = '';
+      document.getElementById('actionTypeDesc').value = '';
+      document.getElementById('actionTypeSeverity').value = 'warning';
+      document.getElementById('actionTypeColor').value = '#F59E0B';
+      document.getElementById('actionTypeLegalBasis').value = '';
+      document.getElementById('actionTypeRequiresFollowup').checked = false;
+      document.getElementById('actionTypeFollowupDays').value = 15;
+      document.getElementById('actionTypeModalTitle').textContent = 'Add Action Type';
+      document.getElementById('deleteActionTypeBtn').style.display = 'none';
+      document.getElementById('actionTypeModal').classList.add('show');
+    }
+
+    function editActionType(id) {
+      const a = actionTypes.find(x => x.id === id);
+      if (!a) return;
+      document.getElementById('editActionTypeId').value = id;
+      document.getElementById('actionTypeName').value = a.name;
+      document.getElementById('actionTypeCode').value = a.code;
+      document.getElementById('actionTypeDesc').value = a.description || '';
+      document.getElementById('actionTypeSeverity').value = a.severity;
+      document.getElementById('actionTypeColor').value = a.color || '#F59E0B';
+      document.getElementById('actionTypeLegalBasis').value = a.legalBasis || '';
+      document.getElementById('actionTypeRequiresFollowup').checked = a.requiresFollowup;
+      document.getElementById('actionTypeFollowupDays').value = a.followupDays || 15;
+      document.getElementById('actionTypeModalTitle').textContent = 'Edit Action Type';
+      document.getElementById('deleteActionTypeBtn').style.display = 'inline-flex';
+      document.getElementById('actionTypeModal').classList.add('show');
+    }
+
+    function closeActionTypeModal() {
+      document.getElementById('actionTypeModal').classList.remove('show');
+    }
+
+    async function saveActionType() {
+      const id = document.getElementById('editActionTypeId').value;
+      const data = {
+        name: document.getElementById('actionTypeName').value,
+        code: document.getElementById('actionTypeCode').value.toUpperCase(),
+        description: document.getElementById('actionTypeDesc').value,
+        severity: document.getElementById('actionTypeSeverity').value,
+        color: document.getElementById('actionTypeColor').value,
+        legalBasis: document.getElementById('actionTypeLegalBasis').value,
+        requiresFollowup: document.getElementById('actionTypeRequiresFollowup').checked,
+        followupDays: document.getElementById('actionTypeRequiresFollowup').checked 
+          ? parseInt(document.getElementById('actionTypeFollowupDays').value) : null
+      };
+
+      if (!data.name || !data.code) {
+        alert('Name and Code are required');
+        return;
+      }
+
+      const url = id ? `/api/admin/fbo-inspection/actions/${id}` : '/api/admin/fbo-inspection/actions';
+      try {
+        const res = await fetch(url, {
+          method: id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Failed to save');
+        closeActionTypeModal();
+        await loadActionTypes();
+        alert(id ? 'Action type updated' : 'Action type created');
+      } catch (e) {
+        alert('Failed to save: ' + e.message);
+      }
+    }
+
+    async function deleteActionType() {
+      const id = document.getElementById('editActionTypeId').value;
+      if (!confirm('Are you sure you want to delete this action type?')) return;
+      try {
+        await fetch(`/api/admin/fbo-inspection/actions/${id}`, { method: 'DELETE' });
+        closeActionTypeModal();
+        await loadActionTypes();
+        alert('Action type deleted');
+      } catch (e) {
+        alert('Failed to delete');
+      }
+    }
+
+    async function resetActionTypes() {
+      if (!confirm('This will reset all action types to defaults. Continue?')) return;
+      try {
+        await fetch('/api/admin/fbo-inspection/actions/reset', { method: 'POST' });
+        await loadActionTypes();
+        alert('Action types reset to defaults');
+      } catch (e) {
+        alert('Failed to reset');
+      }
+    }
+
+    // Form Fields
+    async function loadFormFields() {
+      try {
+        const res = await fetch('/api/admin/fbo-inspection/form-fields');
+        formFields = await res.json();
+        renderFormFields();
+      } catch (e) {
+        console.error('Failed to load form fields:', e);
+      }
+    }
+
+    function renderFormFields() {
+      const groups = {
+        fbo_details: document.getElementById('fboDetailsTable'),
+        inspection_details: document.getElementById('inspectionDetailsTable'),
+        findings: document.getElementById('findingsTable'),
+        actions: document.getElementById('actionsTable'),
+        witness: document.getElementById('witnessTable'),
+        samples: document.getElementById('samplesTable'),
+        evidence: document.getElementById('evidenceTable')
+      };
+      
+      Object.values(groups).forEach(table => { if (table) table.innerHTML = ''; });
+      
+      if (formFields.length === 0) {
+        document.getElementById('noFormFields').style.display = 'block';
+        document.getElementById('formFieldsContainer').style.display = 'none';
+        return;
+      }
+      
+      document.getElementById('noFormFields').style.display = 'none';
+      document.getElementById('formFieldsContainer').style.display = 'block';
+      
+      formFields.forEach(field => {
+        const table = groups[field.fieldGroup];
+        if (!table) return;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><strong>${field.fieldLabel}</strong><br><small style="color:#6b7280">${field.fieldName}</small></td>
+          <td><span class="badge" style="background:#e0e7ff;color:#3730a3">${field.fieldType}</span></td>
+          <td>${field.isRequired ? '<span class="badge badge-active">Yes</span>' : '<span style="color:#9ca3af">No</span>'}</td>
+          <td>${field.isSystemField ? '<span class="badge" style="background:#fef3c7;color:#92400e">System</span>' : '-'}</td>
+          <td>
+            <button class="btn" style="padding:5px 10px;font-size:12px" onclick="editFormField('${field.id}')">Edit</button>
+            ${!field.isSystemField ? `<button class="btn btn-danger" style="padding:5px 10px;font-size:12px;margin-left:5px" onclick="confirmDeleteFormField('${field.id}')">Delete</button>` : ''}
+          </td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    function openFormFieldModal() {
+      document.getElementById('formFieldModalTitle').textContent = 'Add Form Field';
+      document.getElementById('editFormFieldId').value = '';
+      document.getElementById('formFieldLabel').value = '';
+      document.getElementById('formFieldName').value = '';
+      document.getElementById('formFieldType').value = 'text';
+      document.getElementById('formFieldGroup').value = 'fbo_details';
+      document.getElementById('formFieldOrder').value = '1';
+      document.getElementById('formFieldRequired').checked = false;
+      document.getElementById('formFieldPlaceholder').value = '';
+      document.getElementById('formFieldHelpText').value = '';
+      document.getElementById('formFieldDropdownOptions').value = '';
+      document.getElementById('formFieldMaxFiles').value = '5';
+      document.getElementById('formFieldMaxSize').value = '5';
+      document.getElementById('formFieldWatermarkEnabled').checked = true;
+      document.getElementById('formFieldWatermarkGps').checked = true;
+      document.getElementById('deleteFormFieldBtn').style.display = 'none';
+      toggleFieldTypeOptions();
+      document.getElementById('formFieldModal').classList.add('show');
+    }
+
+    function editFormField(id) {
+      const field = formFields.find(f => f.id === id);
+      if (!field) return;
+      
+      document.getElementById('formFieldModalTitle').textContent = 'Edit Form Field';
+      document.getElementById('editFormFieldId').value = field.id;
+      document.getElementById('formFieldLabel').value = field.fieldLabel || '';
+      document.getElementById('formFieldName').value = field.fieldName || '';
+      document.getElementById('formFieldType').value = field.fieldType || 'text';
+      document.getElementById('formFieldGroup').value = field.fieldGroup || 'fbo_details';
+      document.getElementById('formFieldOrder').value = field.displayOrder || 1;
+      document.getElementById('formFieldRequired').checked = field.isRequired || false;
+      document.getElementById('formFieldPlaceholder').value = field.placeholder || '';
+      document.getElementById('formFieldHelpText').value = field.helpText || '';
+      document.getElementById('formFieldDropdownOptions').value = field.dropdownOptions ? JSON.stringify(field.dropdownOptions, null, 2) : '';
+      
+      const fileSettings = field.fileSettings || {};
+      document.getElementById('formFieldMaxFiles').value = fileSettings.maxFiles || 5;
+      document.getElementById('formFieldMaxSize').value = fileSettings.maxSizeMB || 5;
+      
+      const watermarkSettings = field.watermarkSettings || {};
+      document.getElementById('formFieldWatermarkEnabled').checked = watermarkSettings.enabled !== false;
+      document.getElementById('formFieldWatermarkGps').checked = watermarkSettings.showGps !== false;
+      
+      document.getElementById('deleteFormFieldBtn').style.display = field.isSystemField ? 'none' : 'inline-block';
+      toggleFieldTypeOptions();
+      document.getElementById('formFieldModal').classList.add('show');
+    }
+
+    function closeFormFieldModal() {
+      document.getElementById('formFieldModal').classList.remove('show');
+    }
+
+    function toggleFieldTypeOptions() {
+      const type = document.getElementById('formFieldType').value;
+      document.getElementById('dropdownOptionsGroup').style.display = type === 'dropdown' ? 'block' : 'none';
+      document.getElementById('fileSettingsGroup').style.display = type === 'file' ? 'block' : 'none';
+    }
+
+    async function saveFormField() {
+      const id = document.getElementById('editFormFieldId').value;
+      const fieldType = document.getElementById('formFieldType').value;
+      
+      const data = {
+        fieldLabel: document.getElementById('formFieldLabel').value,
+        fieldName: document.getElementById('formFieldName').value,
+        fieldType: fieldType,
+        fieldGroup: document.getElementById('formFieldGroup').value,
+        displayOrder: parseInt(document.getElementById('formFieldOrder').value) || 1,
+        isRequired: document.getElementById('formFieldRequired').checked,
+        placeholder: document.getElementById('formFieldPlaceholder').value || null,
+        helpText: document.getElementById('formFieldHelpText').value || null
+      };
+      
+      if (fieldType === 'dropdown') {
+        try {
+          data.dropdownOptions = JSON.parse(document.getElementById('formFieldDropdownOptions').value || '[]');
+        } catch (e) {
+          alert('Invalid JSON for dropdown options');
+          return;
+        }
+      }
+      
+      if (fieldType === 'file') {
+        data.fileSettings = {
+          maxFiles: parseInt(document.getElementById('formFieldMaxFiles').value) || 5,
+          maxSizeMB: parseInt(document.getElementById('formFieldMaxSize').value) || 5,
+          allowedTypes: ['image/jpeg', 'image/png']
+        };
+        data.watermarkSettings = {
+          enabled: document.getElementById('formFieldWatermarkEnabled').checked,
+          showGps: document.getElementById('formFieldWatermarkGps').checked,
+          showTimestamp: true,
+          position: 'bottom-right',
+          opacity: 0.8
+        };
+      }
+      
+      if (!data.fieldLabel || !data.fieldName) {
+        alert('Field label and name are required');
+        return;
+      }
+      
+      try {
+        const url = id ? `/api/admin/fbo-inspection/form-fields/${id}` : '/api/admin/fbo-inspection/form-fields';
+        const method = id ? 'PUT' : 'POST';
+        await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        closeFormFieldModal();
+        await loadFormFields();
+        alert(id ? 'Form field updated' : 'Form field created');
+      } catch (e) {
+        alert('Failed to save form field');
+      }
+    }
+
+    async function deleteFormField() {
+      const id = document.getElementById('editFormFieldId').value;
+      if (!confirm('Are you sure you want to delete this form field?')) return;
+      try {
+        await fetch(`/api/admin/fbo-inspection/form-fields/${id}`, { method: 'DELETE' });
+        closeFormFieldModal();
+        await loadFormFields();
+        alert('Form field deleted');
+      } catch (e) {
+        alert('Failed to delete');
+      }
+    }
+
+    function confirmDeleteFormField(id) {
+      if (!confirm('Are you sure you want to delete this form field?')) return;
+      fetch(`/api/admin/fbo-inspection/form-fields/${id}`, { method: 'DELETE' })
+        .then(() => loadFormFields())
+        .catch(() => alert('Failed to delete'));
+    }
+
+    async function resetFormFields() {
+      if (!confirm('This will reset all form fields to the 27 default FSSAI inspection fields. Continue?')) return;
+      try {
+        await fetch('/api/admin/fbo-inspection/form-fields/reset', { method: 'POST' });
+        await loadFormFields();
+        alert('Form fields reset to defaults');
+      } catch (e) {
+        alert('Failed to reset');
+      }
+    }
+
+    // Configuration
+    async function loadConfig() {
+      try {
+        const res = await fetch('/api/admin/fbo-inspection/config');
+        const configs = await res.json();
+        configs.forEach(c => { config[c.configKey] = c.configValue; });
+        
+        document.getElementById('configMaxPhotos').value = config.max_photos || 10;
+        document.getElementById('configFollowupDays').value = config.default_followup_days || 15;
+        document.getElementById('configRequireGps').value = config.require_gps || 'true';
+        document.getElementById('configRequirePhoto').value = config.require_photo || 'true';
+        document.getElementById('configWatermark').value = config.watermark_text || 'FSSAI Official Inspection';
+      } catch (e) {
+        console.error('Failed to load config:', e);
+      }
+    }
+
+    async function saveConfig() {
+      const configs = [
+        { configKey: 'max_photos', configValue: document.getElementById('configMaxPhotos').value, configType: 'number' },
+        { configKey: 'default_followup_days', configValue: document.getElementById('configFollowupDays').value, configType: 'number' },
+        { configKey: 'require_gps', configValue: document.getElementById('configRequireGps').value, configType: 'boolean' },
+        { configKey: 'require_photo', configValue: document.getElementById('configRequirePhoto').value, configType: 'boolean' },
+        { configKey: 'watermark_text', configValue: document.getElementById('configWatermark').value, configType: 'string' }
+      ];
+
+      try {
+        await fetch('/api/admin/fbo-inspection/config', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ configs })
+        });
+        alert('Configuration saved');
+      } catch (e) {
+        alert('Failed to save configuration');
+      }
+    }
+
+    function logout() {
+      fetch('/api/admin/logout', { method: 'POST' })
+        .then(() => window.location.href = '/admin/login');
+    }
+  </script>
+</body>
+</html>
