@@ -1,0 +1,794 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Action Dashboard Config - Food Safety Inspector</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #f3f4f6;
+        min-height: 100vh;
+      }
+      .header {
+        background: #1E40AF;
+        color: white;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .header-logo {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .header-title {
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .header-subtitle {
+        font-size: 12px;
+        opacity: 0.8;
+      }
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .back-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.2s;
+      }
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .main {
+        padding: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1f2937;
+      }
+      .page-subtitle {
+        color: #6b7280;
+        font-size: 14px;
+        margin-top: 4px;
+      }
+      .action-btns {
+        display: flex;
+        gap: 12px;
+      }
+      .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+      }
+      .btn-primary {
+        background: #1E40AF;
+        color: white;
+      }
+      .btn-primary:hover {
+        background: #1e3a8a;
+      }
+      .btn-success {
+        background: #059669;
+        color: white;
+      }
+      .btn-success:hover {
+        background: #047857;
+      }
+      .btn-secondary {
+        background: white;
+        color: #374151;
+        border: 1px solid #d1d5db;
+      }
+      .btn-secondary:hover {
+        background: #f9fafb;
+      }
+      .tabs {
+        display: flex;
+        gap: 4px;
+        background: white;
+        padding: 4px;
+        border-radius: 10px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .tab {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        transition: all 0.2s;
+      }
+      .tab.active {
+        background: #1E40AF;
+        color: white;
+      }
+      .tab:hover:not(.active) {
+        background: #f3f4f6;
+      }
+      .section {
+        display: none;
+      }
+      .section.active {
+        display: block;
+      }
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      .group-header {
+        font-size: 16px;
+        font-weight: 600;
+        color: #374151;
+        padding: 12px 0;
+        border-bottom: 2px solid #e5e7eb;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .group-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+      }
+      .group-legal { background: #fee2e2; color: #dc2626; }
+      .group-inspection { background: #dbeafe; color: #1E40AF; }
+      .group-sampling { background: #d1fae5; color: #059669; }
+      .group-administrative { background: #ede9fe; color: #7c3aed; }
+      .group-protocol { background: #fef3c7; color: #d97706; }
+      .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .category-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 16px;
+        transition: all 0.2s;
+      }
+      .category-card:hover {
+        border-color: #1E40AF;
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.1);
+      }
+      .category-card.disabled {
+        opacity: 0.5;
+        background: #f3f4f6;
+      }
+      .category-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .category-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+      .category-name {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 15px;
+      }
+      .category-code {
+        font-size: 11px;
+        color: #6b7280;
+        font-family: monospace;
+      }
+      .category-meta {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      .meta-item {
+        font-size: 12px;
+        color: #6b7280;
+      }
+      .meta-item span {
+        font-weight: 500;
+        color: #374151;
+      }
+      .priority-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+      }
+      .priority-critical {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+      .priority-high {
+        background: #fef3c7;
+        color: #d97706;
+      }
+      .priority-normal {
+        background: #dbeafe;
+        color: #1E40AF;
+      }
+      .category-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #e5e7eb;
+      }
+      .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #d1d5db;
+        transition: .3s;
+        border-radius: 24px;
+      }
+      .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+      }
+      input:checked + .toggle-slider {
+        background-color: #059669;
+      }
+      input:checked + .toggle-slider:before {
+        transform: translateX(20px);
+      }
+      .toggle-label {
+        font-size: 12px;
+        color: #6b7280;
+        margin-left: 8px;
+      }
+      .sla-input {
+        width: 60px;
+        padding: 4px 8px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 13px;
+        text-align: center;
+      }
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .stat-box {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .stat-number {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1f2937;
+      }
+      .stat-label {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 4px;
+      }
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #6b7280;
+      }
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        border-radius: 10px;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.3s;
+        z-index: 1000;
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast.success {
+        background: #059669;
+      }
+      .toast.error {
+        background: #dc2626;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6b7280;
+      }
+      .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+      }
+      .form-group {
+        margin-bottom: 16px;
+      }
+      .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 6px;
+      }
+      .form-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: #1E40AF;
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-left">
+        <div class="header-logo">
+          <svg viewBox="0 0 24 24" fill="white">
+            <path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 18.5L4 16V8.5l8 4v8zm1-9l-8-4 8-4 8 4-8 4zm7 4.5l-6 3v-7l6-3v7z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="header-title">Action Dashboard Configuration</div>
+          <div class="header-subtitle">Manage categories, SLA settings, and reminders</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <a href="/admin/dashboard" class="back-btn">← Back to Dashboard</a>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Action Dashboard Settings</div>
+          <div class="page-subtitle">Configure action categories, SLA timelines, and reminder settings for the mobile dashboard</div>
+        </div>
+        <div class="action-btns">
+          <button class="btn btn-success" onclick="seedDefaults()">Load Default Categories</button>
+        </div>
+      </div>
+
+      <div class="stats-row" id="statsRow">
+        <div class="stat-box">
+          <div class="stat-number" id="totalCategories">-</div>
+          <div class="stat-label">Total Categories</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="enabledCategories">-</div>
+          <div class="stat-label">Enabled Categories</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="criticalCategories">-</div>
+          <div class="stat-label">Critical Priority</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="categoryGroups">-</div>
+          <div class="stat-label">Category Groups</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('categories')">Action Categories</button>
+        <button class="tab" onclick="switchTab('preview')">Dashboard Preview</button>
+      </div>
+
+      <div id="categoriesSection" class="section active">
+        <div id="categoriesContainer">
+          <div class="loading">Loading categories...</div>
+        </div>
+      </div>
+
+      <div id="previewSection" class="section">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Mobile Dashboard Preview</div>
+          </div>
+          <div id="previewContainer" style="max-width: 400px; margin: 0 auto; background: #f3f4f6; border-radius: 20px; padding: 20px;">
+            <div class="loading">Loading preview...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+      let categories = [];
+      
+      const groupLabels = {
+        legal: { name: 'Legal & Court', icon: '⚖️', class: 'group-legal' },
+        inspection: { name: 'Inspections & Enforcement', icon: '🔍', class: 'group-inspection' },
+        sampling: { name: 'Sampling & Laboratory', icon: '🧪', class: 'group-sampling' },
+        administrative: { name: 'Administrative & Compliance', icon: '📋', class: 'group-administrative' },
+        protocol: { name: 'Protocol & Special Duties', icon: '🛡️', class: 'group-protocol' }
+      };
+
+      function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast ${type} show`;
+        setTimeout(() => {
+          toast.className = 'toast';
+        }, 3000);
+      }
+
+      function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        
+        event.target.classList.add('active');
+        document.getElementById(tab + 'Section').classList.add('active');
+        
+        if (tab === 'preview') {
+          loadPreview();
+        }
+      }
+
+      async function loadCategories() {
+        try {
+          const response = await fetch('/api/action-categories');
+          categories = await response.json();
+          renderCategories();
+          updateStats();
+        } catch (error) {
+          console.error('Error loading categories:', error);
+          document.getElementById('categoriesContainer').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>No categories found. Click "Load Default Categories" to get started.</p></div>';
+        }
+      }
+
+      function updateStats() {
+        document.getElementById('totalCategories').textContent = categories.length;
+        document.getElementById('enabledCategories').textContent = categories.filter(c => c.isEnabled).length;
+        document.getElementById('criticalCategories').textContent = categories.filter(c => c.priority === 'critical').length;
+        const groups = [...new Set(categories.map(c => c.group))];
+        document.getElementById('categoryGroups').textContent = groups.length;
+      }
+
+      function renderCategories() {
+        if (categories.length === 0) {
+          document.getElementById('categoriesContainer').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>No categories found. Click "Load Default Categories" to get started.</p></div>';
+          return;
+        }
+
+        const grouped = {};
+        categories.forEach(cat => {
+          if (!grouped[cat.group]) {
+            grouped[cat.group] = [];
+          }
+          grouped[cat.group].push(cat);
+        });
+
+        let html = '';
+        const groupOrder = ['legal', 'inspection', 'sampling', 'administrative', 'protocol'];
+        
+        groupOrder.forEach(groupKey => {
+          if (grouped[groupKey] && grouped[groupKey].length > 0) {
+            const groupInfo = groupLabels[groupKey] || { name: groupKey, icon: '📌', class: '' };
+            html += `
+              <div class="group-header">
+                <div class="group-icon ${groupInfo.class}">${groupInfo.icon}</div>
+                ${groupInfo.name} (${grouped[groupKey].length})
+              </div>
+              <div class="category-grid">
+            `;
+            
+            grouped[groupKey].forEach(cat => {
+              html += renderCategoryCard(cat);
+            });
+            
+            html += '</div>';
+          }
+        });
+
+        document.getElementById('categoriesContainer').innerHTML = html;
+      }
+
+      function renderCategoryCard(cat) {
+        const priorityClass = `priority-${cat.priority}`;
+        const disabledClass = cat.isEnabled ? '' : 'disabled';
+        
+        return `
+          <div class="category-card ${disabledClass}" id="cat-${cat.id}">
+            <div class="category-header">
+              <div class="category-icon" style="background: ${cat.color}15; color: ${cat.color};">
+                ${getIconEmoji(cat.icon)}
+              </div>
+              <div>
+                <div class="category-name">${cat.name}</div>
+                <div class="category-code">${cat.code}</div>
+              </div>
+            </div>
+            <div class="category-meta">
+              <div class="meta-item">Entity: <span>${cat.entityType}</span></div>
+              <div class="meta-item">SLA: <span>${cat.slaDefaultDays} days</span></div>
+              <span class="priority-badge ${priorityClass}">${cat.priority}</span>
+            </div>
+            <div class="category-actions">
+              <label class="toggle-switch">
+                <input type="checkbox" ${cat.isEnabled ? 'checked' : ''} onchange="toggleCategory('${cat.id}', 'isEnabled', this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label">Enabled</span>
+              
+              <label class="toggle-switch" style="margin-left: 16px;">
+                <input type="checkbox" ${cat.showOnDashboard ? 'checked' : ''} onchange="toggleCategory('${cat.id}', 'showOnDashboard', this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label">Show on Dashboard</span>
+              
+              <input type="number" class="sla-input" value="${cat.slaDefaultDays}" 
+                onchange="updateSLA('${cat.id}', this.value)" 
+                style="margin-left: auto;" 
+                title="SLA Days">
+              <span class="toggle-label">days</span>
+            </div>
+          </div>
+        `;
+      }
+
+      function getIconEmoji(iconName) {
+        const iconMap = {
+          'briefcase': '💼',
+          'file-text': '📄',
+          'dollar-sign': '💰',
+          'refresh-cw': '🔄',
+          'clipboard': '📋',
+          'alert-triangle': '⚠️',
+          'lock': '🔒',
+          'trash-2': '🗑️',
+          'package': '📦',
+          'clock': '⏰',
+          'file-plus': '📁',
+          'alert-octagon': '🚨',
+          'alert-circle': '❗',
+          'tag': '🏷️',
+          'shield-off': '🛡️',
+          'target': '🎯',
+          'users': '👥',
+          'calendar': '📅',
+          'star': '⭐',
+          'message-circle': '💬',
+          'shield': '🛡️',
+        };
+        return iconMap[iconName] || '📌';
+      }
+
+      async function toggleCategory(id, field, value) {
+        try {
+          await fetch(`/api/action-categories/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ [field]: value })
+          });
+          
+          const cat = categories.find(c => c.id === id);
+          if (cat) cat[field] = value;
+          
+          const card = document.getElementById(`cat-${id}`);
+          if (field === 'isEnabled') {
+            card.classList.toggle('disabled', !value);
+          }
+          
+          updateStats();
+          showToast('Category updated');
+        } catch (error) {
+          console.error('Error updating category:', error);
+          showToast('Failed to update category', 'error');
+        }
+      }
+
+      async function updateSLA(id, days) {
+        try {
+          await fetch(`/api/action-categories/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slaDefaultDays: parseInt(days) })
+          });
+          
+          const cat = categories.find(c => c.id === id);
+          if (cat) cat.slaDefaultDays = parseInt(days);
+          
+          showToast('SLA updated');
+        } catch (error) {
+          console.error('Error updating SLA:', error);
+          showToast('Failed to update SLA', 'error');
+        }
+      }
+
+      async function seedDefaults() {
+        try {
+          const response = await fetch('/api/action-categories/seed-defaults', {
+            method: 'POST'
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            categories = data.categories;
+            renderCategories();
+            updateStats();
+            showToast('Default categories loaded successfully');
+          } else {
+            throw new Error('Failed to seed defaults');
+          }
+        } catch (error) {
+          console.error('Error seeding defaults:', error);
+          showToast('Failed to load default categories', 'error');
+        }
+      }
+
+      async function loadPreview() {
+        try {
+          const response = await fetch('/api/action-dashboard');
+          const data = await response.json();
+          renderPreview(data);
+        } catch (error) {
+          console.error('Error loading preview:', error);
+          document.getElementById('previewContainer').innerHTML = '<div class="empty-state">Failed to load preview</div>';
+        }
+      }
+
+      function renderPreview(data) {
+        let html = `
+          <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+            <div style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Action Dashboard</div>
+            <div style="font-size: 12px; color: #6b7280;">Today's overview</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+            <div style="background: #fee2e2; border-radius: 12px; padding: 12px; text-align: center;">
+              <div style="font-size: 24px; font-weight: 700; color: #dc2626;">${data.totals.overdueItems}</div>
+              <div style="font-size: 11px; color: #dc2626;">Overdue</div>
+            </div>
+            <div style="background: #fef3c7; border-radius: 12px; padding: 12px; text-align: center;">
+              <div style="font-size: 24px; font-weight: 700; color: #d97706;">${data.totals.dueToday}</div>
+              <div style="font-size: 11px; color: #d97706;">Due Today</div>
+            </div>
+            <div style="background: #dbeafe; border-radius: 12px; padding: 12px; text-align: center;">
+              <div style="font-size: 24px; font-weight: 700; color: #1E40AF;">${data.totals.dueThisWeek}</div>
+              <div style="font-size: 11px; color: #1E40AF;">This Week</div>
+            </div>
+            <div style="background: #d1fae5; border-radius: 12px; padding: 12px; text-align: center;">
+              <div style="font-size: 24px; font-weight: 700; color: #059669;">${data.totals.totalItems}</div>
+              <div style="font-size: 11px; color: #059669;">Total Actions</div>
+            </div>
+          </div>
+        `;
+
+        const groupOrder = ['legal', 'inspection', 'sampling', 'administrative', 'protocol'];
+        groupOrder.forEach(group => {
+          const groupCats = data.categories.filter(c => c.group === group);
+          if (groupCats.length > 0) {
+            const groupInfo = groupLabels[group];
+            html += `
+              <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin: 16px 0 8px; text-transform: uppercase;">${groupInfo.icon} ${groupInfo.name}</div>
+            `;
+            groupCats.forEach(cat => {
+              html += `
+                <div style="background: white; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 40px; height: 40px; border-radius: 10px; background: ${cat.color}15; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: ${cat.color};">${getIconEmoji(cat.icon)}</span>
+                  </div>
+                  <div style="flex: 1;">
+                    <div style="font-weight: 600; font-size: 14px;">${cat.name}</div>
+                    <div style="font-size: 11px; color: #6b7280;">${cat.counts.pending} pending · ${cat.counts.overdue} overdue</div>
+                  </div>
+                  <div style="font-size: 20px; font-weight: 700; color: ${cat.counts.overdue > 0 ? '#dc2626' : '#1f2937'};">${cat.counts.total}</div>
+                </div>
+              `;
+            });
+          }
+        });
+
+        document.getElementById('previewContainer').innerHTML = html;
+      }
+
+      // Initialize
+      loadCategories();
+    </script>
+  </body>
+</html>
