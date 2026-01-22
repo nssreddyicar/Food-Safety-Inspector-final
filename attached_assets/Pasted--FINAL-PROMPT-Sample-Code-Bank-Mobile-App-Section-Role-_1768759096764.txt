@@ -1,0 +1,145 @@
+🔹 FINAL PROMPT — Sample Code Bank (Mobile App Section)
+
+Role: You are a senior mobile app product designer and backend system architect.
+
+Objective: Design a new “Sample Code Bank” section inside the Profile module of a mobile application used for food safety enforcement and surveillance.
+
+1️⃣ Section Overview
+
+The Sample Code Bank allows officers to generate, manage, assign, and track sample codes for:
+
+Enforcement samples
+
+Surveillance samples
+
+This section must support bulk generation, increment logic, and full usage auditability.
+
+2️⃣ Sample Code Structure
+
+Each sample code is composed of three numeric parts:
+
+Prefix
+
+Middle
+
+Suffix
+
+Each part must support:
+
+Manual numeric input
+
+Independent increment enable/disable
+
+Custom increment value (e.g., +1, +5, +10)
+
+3️⃣ Sample Code Generation Rules
+
+User inputs:
+
+Starting values for Prefix / Middle / Suffix
+
+Which field(s) should increment
+
+Increment value for enabled field(s)
+
+Total number of sample codes to generate
+
+Example:
+
+Prefix = 147 (increment enabled)
+
+Increment value = +1
+
+Quantity = 10
+
+Generated Prefix values: 147 → 156
+
+Middle and Suffix remain unchanged unless increment is enabled.
+
+The system must generate exactly N unique sample codes.
+
+4️⃣ Sample Code Status Management
+
+Each generated sample code must have a status:
+
+Available
+
+Used
+
+Rules:
+
+A sample code can be used only once
+
+Used codes cannot be edited or reused
+
+5️⃣ Usage Tracking & Audit Trail
+
+When a sample code is marked as Used, store and display:
+
+Full sample code
+
+Sample type (Enforcement / Surveillance)
+
+Linked sample reference number
+
+Date & time of use
+
+Officer / user who used the code
+
+Location (if available)
+
+Users must be able to tap a Used code to view complete usage details.
+
+6️⃣ UI / UX Requirements
+
+Location: Profile → Sample Code Bank
+
+Tabs:
+
+Enforcement
+
+Surveillance
+
+Actions:
+
+Generate Sample Codes
+
+View Available Codes
+
+View Used Codes
+
+Filters:
+
+Status (Available / Used)
+
+Date range
+
+Prefix / Middle / Suffix search
+
+7️⃣ Backend & Data Requirements
+
+Prevent duplicate sample codes
+
+Ensure atomic updates when marking a code as Used
+
+Maintain immutable audit logs
+
+Support offline usage with sync conflict handling
+
+Future support for export (PDF / Excel)
+
+8️⃣ Expected Output
+
+Provide:
+
+Database schema / data model
+
+Sample code generation algorithm
+
+API endpoints (create, list, assign, audit)
+
+UI flow or wireframe description
+
+Validation rules and edge cases
+
+Design with scalability, legal compliance, and audit-readiness in mind.
