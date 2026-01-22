@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Multi-Page Document Template</title>
+  <style>
+    /* Page Setup - A4 Portrait with margins */
+    @page {
+      size: A4 portrait;
+      margin: 20mm 15mm 25mm 15mm;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      font-family: 'Times New Roman', serif;
+      font-size: 12pt;
+      line-height: 1.5;
+      color: #1f2937;
+    }
+    
+    /* Document Header - appears once at top */
+    .document-header {
+      text-align: center;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #1E40AF;
+      margin-bottom: 20px;
+    }
+    
+    .document-header h1 {
+      font-size: 16pt;
+      font-weight: bold;
+      color: #1E40AF;
+      margin-bottom: 4px;
+    }
+    
+    .document-header .subtitle {
+      font-size: 11pt;
+      color: #6b7280;
+    }
+    
+    /* Section Headings */
+    h2 {
+      font-size: 13pt;
+      font-weight: bold;
+      color: #1f2937;
+      margin: 20px 0 12px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e5e7eb;
+      page-break-after: avoid;
+    }
+    
+    /* Tables with automatic page flow */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      page-break-inside: auto;
+    }
+    
+    /* Table header repeats on each page */
+    thead {
+      display: table-header-group;
+    }
+    
+    /* Table footer for totals - appears at end */
+    tfoot {
+      display: table-footer-group;
+    }
+    
+    tbody {
+      display: table-row-group;
+    }
+    
+    /* Prevent row breaks */
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+    
+    th {
+      background: #1E40AF;
+      color: white;
+      font-weight: 600;
+      padding: 10px 12px;
+      text-align: left;
+      border: 1px solid #1E40AF;
+    }
+    
+    td {
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      vertical-align: top;
+    }
+    
+    /* Alternating row colors */
+    tbody tr:nth-child(even) {
+      background: #f9fafb;
+    }
+    
+    /* Running Footer - appears on every page */
+    .page-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 20mm;
+      padding: 8px 15mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10pt;
+      color: #6b7280;
+      border-top: 1px solid #e5e7eb;
+    }
+    
+    /* Page number counter - auto-increments */
+    .page-number::before {
+      counter-increment: page;
+      content: counter(page) " :";
+    }
+    
+    /* Continuation text - hidden on last page via JS */
+    .continuation {
+      font-style: italic;
+      color: #9ca3af;
+    }
+    
+    /* Utility classes */
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    .font-bold { font-weight: bold; }
+    .total-row td { font-weight: bold; background: #f3f4f6; }
+    
+    /* Page break utilities */
+    .page-break { page-break-after: always; }
+    .page-break-before { page-break-before: always; }
+    .avoid-break { page-break-inside: avoid; }
+    
+    /* Signature section */
+    .signature-section {
+      margin-top: 40px;
+      page-break-inside: avoid;
+    }
+    
+    .signature-line {
+      display: inline-block;
+      width: 200px;
+      border-bottom: 1px solid #000;
+      margin-top: 30px;
+    }
+    
+    .signature-label {
+      font-size: 10pt;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    
+    @media print {
+      html, body { background: white; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Running footer that appears on all pages -->
+  <div class="page-footer">
+    <span class="page-number"></span>
+    <span class="continuation" id="continuation-text">—Contd. on next page—</span>
+  </div>
+  
+  <!-- Document Header -->
+  <div class="document-header">
+    <h1>FOOD SAFETY INSPECTION REPORT</h1>
+    <div class="subtitle">Form No. FSS-IR-001 | Financial Year 2025-26</div>
+  </div>
+  
+  <!-- Basic Information Section -->
+  <h2>1. Inspection Details</h2>
+  <table>
+    <tbody>
+      <tr>
+        <td style="width: 30%;"><strong>Inspection Date:</strong></td>
+        <td><strong>{{inspection_date}}</strong></td>
+        <td style="width: 30%;"><strong>Inspection No:</strong></td>
+        <td><strong>{{inspection_number}}</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Officer Name:</strong></td>
+        <td><strong>{{officer_name}}</strong></td>
+        <td><strong>Designation:</strong></td>
+        <td><strong>{{officer_designation}}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h2>2. FBO Details</h2>
+  <table>
+    <tbody>
+      <tr>
+        <td style="width: 30%;"><strong>Business Name:</strong></td>
+        <td colspan="3"><strong>{{fbo_name}}</strong></td>
+      </tr>
+      <tr>
+        <td><strong>License No:</strong></td>
+        <td><strong>{{fbo_license}}</strong></td>
+        <td><strong>Type:</strong></td>
+        <td><strong>{{fbo_type}}</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Address:</strong></td>
+        <td colspan="3"><strong>{{fbo_address}}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <!-- Sample Data Table - demonstrates multi-page flow -->
+  <h2>3. Samples Collected</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 8%;">S.No</th>
+        <th style="width: 25%;">Sample Name</th>
+        <th style="width: 15%;">Sample Code</th>
+        <th style="width: 12%;">Quantity</th>
+        <th style="width: 15%;">Collection Date</th>
+        <th style="width: 25%;">Remarks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="text-center">1</td><td>Milk (Full Cream)</td><td>ENF-2025-001</td><td>500 ml</td><td>15-Jan-2025</td><td>Collected from storage tank</td></tr>
+      <tr><td class="text-center">2</td><td>Butter (Salted)</td><td>ENF-2025-002</td><td>250 gm</td><td>15-Jan-2025</td><td>Branded pack</td></tr>
+      <tr><td class="text-center">3</td><td>Paneer (Fresh)</td><td>ENF-2025-003</td><td>300 gm</td><td>15-Jan-2025</td><td>Loose sample</td></tr>
+      <tr><td class="text-center">4</td><td>Curd (Plain)</td><td>ENF-2025-004</td><td>400 ml</td><td>15-Jan-2025</td><td>Homemade</td></tr>
+      <tr><td class="text-center">5</td><td>Ghee (Cow)</td><td>ENF-2025-005</td><td>200 gm</td><td>15-Jan-2025</td><td>Tin pack</td></tr>
+      <tr><td class="text-center">6</td><td>Ice Cream (Vanilla)</td><td>ENF-2025-006</td><td>100 gm</td><td>15-Jan-2025</td><td>Branded cone</td></tr>
+      <tr><td class="text-center">7</td><td>Khoya</td><td>ENF-2025-007</td><td>250 gm</td><td>15-Jan-2025</td><td>Fresh preparation</td></tr>
+      <tr><td class="text-center">8</td><td>Cheese (Processed)</td><td>ENF-2025-008</td><td>150 gm</td><td>15-Jan-2025</td><td>Sliced pack</td></tr>
+      <tr><td class="text-center">9</td><td>Flavored Milk</td><td>ENF-2025-009</td><td>200 ml</td><td>15-Jan-2025</td><td>Chocolate flavor</td></tr>
+      <tr><td class="text-center">10</td><td>Milk Powder</td><td>ENF-2025-010</td><td>500 gm</td><td>15-Jan-2025</td><td>Infant formula</td></tr>
+      <tr><td class="text-center">11</td><td>Condensed Milk</td><td>ENF-2025-011</td><td>400 gm</td><td>16-Jan-2025</td><td>Tin pack</td></tr>
+      <tr><td class="text-center">12</td><td>Lassi (Sweet)</td><td>ENF-2025-012</td><td>300 ml</td><td>16-Jan-2025</td><td>Fresh preparation</td></tr>
+      <tr><td class="text-center">13</td><td>Shrikhand</td><td>ENF-2025-013</td><td>200 gm</td><td>16-Jan-2025</td><td>Mango flavor</td></tr>
+      <tr><td class="text-center">14</td><td>Rabri</td><td>ENF-2025-014</td><td>250 gm</td><td>16-Jan-2025</td><td>Sweet preparation</td></tr>
+      <tr><td class="text-center">15</td><td>Kulfi</td><td>ENF-2025-015</td><td>100 gm</td><td>16-Jan-2025</td><td>Malai flavor</td></tr>
+      <tr><td class="text-center">16</td><td>Buttermilk</td><td>ENF-2025-016</td><td>500 ml</td><td>16-Jan-2025</td><td>Spiced</td></tr>
+      <tr><td class="text-center">17</td><td>Whey Protein</td><td>ENF-2025-017</td><td>500 gm</td><td>16-Jan-2025</td><td>Supplement pack</td></tr>
+      <tr><td class="text-center">18</td><td>Cream (Fresh)</td><td>ENF-2025-018</td><td>200 ml</td><td>16-Jan-2025</td><td>Dairy fresh</td></tr>
+      <tr><td class="text-center">19</td><td>Cheese Spread</td><td>ENF-2025-019</td><td>150 gm</td><td>17-Jan-2025</td><td>Herb flavor</td></tr>
+      <tr><td class="text-center">20</td><td>Yogurt (Greek)</td><td>ENF-2025-020</td><td>200 gm</td><td>17-Jan-2025</td><td>Plain variety</td></tr>
+    </tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td colspan="3" class="text-right">Total Samples:</td>
+        <td colspan="3">20</td>
+      </tr>
+    </tfoot>
+  </table>
+  
+  <h2>4. Deviations Observed</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 8%;">S.No</th>
+        <th style="width: 35%;">Deviation</th>
+        <th style="width: 15%;">Severity</th>
+        <th style="width: 42%;">Corrective Action Required</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="text-center">1</td><td>Temperature of cold storage above prescribed limit</td><td>Major</td><td>Repair/replace refrigeration unit within 7 days</td></tr>
+      <tr><td class="text-center">2</td><td>Missing date labels on stored products</td><td>Minor</td><td>Implement labeling system immediately</td></tr>
+      <tr><td class="text-center">3</td><td>Pest control records not maintained</td><td>Major</td><td>Engage licensed pest control agency</td></tr>
+      <tr><td class="text-center">4</td><td>Food handlers without health certificates</td><td>Critical</td><td>Obtain medical fitness certificates within 15 days</td></tr>
+      <tr><td class="text-center">5</td><td>Cross-contamination risk in storage area</td><td>Major</td><td>Segregate raw and cooked food storage</td></tr>
+    </tbody>
+  </table>
+  
+  <!-- Signature Section - kept together -->
+  <div class="signature-section">
+    <h2>5. Signatures</h2>
+    <table>
+      <tbody>
+        <tr>
+          <td style="width: 50%; padding: 20px;">
+            <div class="signature-line"></div>
+            <div class="signature-label">Signature of Inspecting Officer</div>
+            <div style="margin-top: 8px;"><strong>{{officer_name}}</strong></div>
+            <div class="signature-label">{{officer_designation}}</div>
+          </td>
+          <td style="width: 50%; padding: 20px;">
+            <div class="signature-line"></div>
+            <div class="signature-label">Signature of FBO Representative</div>
+            <div style="margin-top: 8px;"><strong>{{fbo_representative}}</strong></div>
+            <div class="signature-label">Proprietor/Manager</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <script>
+    // Calculate total pages and update continuation text
+    window.onload = function() {
+      // For browsers that support it, check if last page
+      if (window.matchMedia) {
+        var mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener(function(mql) {
+          updatePagination();
+        });
+      }
+    };
+    
+    window.onbeforeprint = function() {
+      updatePagination();
+    };
+    
+    function updatePagination() {
+      // This runs before printing to potentially hide continuation on last page
+      // Note: Full implementation requires PDF generator support
+    }
+  </script>
+</body>
+</html>
