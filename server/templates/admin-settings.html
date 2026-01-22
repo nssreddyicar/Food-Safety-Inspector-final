@@ -1,0 +1,381 @@
+<!doctype html>
+<html>
+  <head>
+    <title>System Settings - Food Safety Inspector</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f3f4f6; min-height: 100vh; }
+      .header { background: #1E40AF; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+      .header-left { display: flex; align-items: center; gap: 12px; }
+      .header-logo { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+      .header-logo svg { width: 24px; height: 24px; fill: white; }
+      .header-title { font-size: 18px; font-weight: 600; }
+      .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; text-decoration: none; }
+      .back-btn:hover { background: rgba(255,255,255,0.2); }
+      .main { padding: 24px; max-width: 900px; margin: 0 auto; }
+      .page-title { font-size: 24px; font-weight: 700; color: #1f2937; margin-bottom: 24px; }
+      .settings-card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; }
+      .card-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; }
+      .card-title { font-size: 18px; font-weight: 600; color: #1f2937; }
+      .card-subtitle { font-size: 14px; color: #6b7280; margin-top: 4px; }
+      .card-body { padding: 24px; }
+      .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #e5e7eb; }
+      .setting-row:last-child { border-bottom: none; }
+      .setting-info { flex: 1; }
+      .setting-label { font-size: 14px; font-weight: 500; color: #1f2937; margin-bottom: 4px; }
+      .setting-desc { font-size: 13px; color: #6b7280; }
+      .setting-control { margin-left: 24px; }
+      .form-input { padding: 8px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 6px; outline: none; min-width: 200px; }
+      .form-input:focus { border-color: #1E40AF; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+      .toggle { position: relative; width: 48px; height: 24px; background: #d1d5db; border-radius: 12px; cursor: pointer; transition: background 0.3s; }
+      .toggle.active { background: #1E40AF; }
+      .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: transform 0.3s; }
+      .toggle.active::after { transform: translateX(24px); }
+      .add-setting-btn { display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: #eff6ff; color: #1E40AF; border: 1px dashed #1E40AF; border-radius: 8px; font-size: 14px; cursor: pointer; width: 100%; justify-content: center; margin-top: 16px; }
+      .add-setting-btn:hover { background: #dbeafe; }
+      .save-btn { background: #1E40AF; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+      .save-btn:hover { background: #1e3a8a; }
+      .actions { display: flex; justify-content: flex-end; margin-top: 24px; }
+      .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+      .modal.show { display: flex; }
+      .modal-content { background: white; border-radius: 12px; padding: 24px; width: 100%; max-width: 500px; }
+      .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #1f2937; }
+      .form-group { margin-bottom: 16px; }
+      .form-label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+      .form-select { width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; }
+      .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+      .cancel-btn { padding: 10px 20px; border: 1px solid #d1d5db; background: white; border-radius: 8px; font-size: 14px; cursor: pointer; }
+      .success-message { background: #d1fae5; color: #059669; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; display: none; }
+      .success-message.show { display: block; }
+      .delete-btn { padding: 4px 8px; background: #fef2f2; color: #dc2626; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; margin-left: 8px; }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-left">
+        <div class="header-logo">
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        </div>
+        <div class="header-title">System Settings</div>
+      </div>
+      <a href="/admin/dashboard" class="back-btn">Back to Dashboard</a>
+    </header>
+
+    <main class="main">
+      <h1 class="page-title">System Settings</h1>
+
+      <div class="success-message" id="success-message">Settings saved successfully!</div>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div class="card-title">General Settings</div>
+          <div class="card-subtitle">Configure general system parameters</div>
+        </div>
+        <div class="card-body">
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Lab Report Deadline (Days)</div>
+              <div class="setting-desc">Number of days allowed for lab report submission</div>
+            </div>
+            <div class="setting-control">
+              <input type="number" class="form-input" id="lab_report_deadline" value="14" min="1" max="60" style="width: 100px;" />
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Maximum Samples per Inspection</div>
+              <div class="setting-desc">Limit the number of samples that can be lifted per inspection</div>
+            </div>
+            <div class="setting-control">
+              <input type="number" class="form-input" id="max_samples_per_inspection" value="10" min="1" max="50" style="width: 100px;" />
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Auto-submit Draft Inspections</div>
+              <div class="setting-desc">Automatically submit draft inspections after 48 hours</div>
+            </div>
+            <div class="setting-control">
+              <div class="toggle" id="auto_submit_drafts" onclick="toggleSetting(this)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div class="card-title">Notification Settings</div>
+          <div class="card-subtitle">Configure email and push notification preferences</div>
+        </div>
+        <div class="card-body">
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Email Notifications</div>
+              <div class="setting-desc">Send email notifications for important events</div>
+            </div>
+            <div class="setting-control">
+              <div class="toggle active" id="email_notifications" onclick="toggleSetting(this)"></div>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Deadline Reminders</div>
+              <div class="setting-desc">Send reminders before lab report deadlines</div>
+            </div>
+            <div class="setting-control">
+              <div class="toggle active" id="deadline_reminders" onclick="toggleSetting(this)"></div>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Reminder Days Before Deadline</div>
+              <div class="setting-desc">Days before deadline to send reminder</div>
+            </div>
+            <div class="setting-control">
+              <input type="number" class="form-input" id="reminder_days" value="3" min="1" max="14" style="width: 100px;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div class="card-title">Workflow Settings</div>
+          <div class="card-subtitle">Configure sample workflow behavior and editing rules</div>
+        </div>
+        <div class="card-body">
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Node Edit Time Period (Hours)</div>
+              <div class="setting-desc">Number of hours after completing a workflow node during which officers can still edit it. After this period, the node becomes locked and cannot be modified.</div>
+            </div>
+            <div class="setting-control">
+              <input type="number" class="form-input" id="workflow_node_edit_hours" value="48" min="0" max="720" style="width: 100px;" />
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Allow Node Editing</div>
+              <div class="setting-desc">Enable or disable editing of completed workflow nodes (within the time period)</div>
+            </div>
+            <div class="setting-control">
+              <div class="toggle active" id="workflow_allow_node_edit" onclick="toggleSetting(this)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div class="card-title">Custom Settings</div>
+          <div class="card-subtitle">Add custom configuration parameters</div>
+        </div>
+        <div class="card-body" id="custom-settings">
+        </div>
+        <div style="padding: 0 24px 24px;">
+          <button class="add-setting-btn" onclick="openModal()">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Add Custom Setting
+          </button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="save-btn" onclick="saveAllSettings()">Save All Settings</button>
+      </div>
+    </main>
+
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <h2 class="modal-title">Add Custom Setting</h2>
+        <form id="setting-form">
+          <div class="form-group">
+            <label class="form-label">Setting Key *</label>
+            <input type="text" class="form-input" id="setting-key" required placeholder="e.g., custom_timeout" style="width: 100%;" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Value *</label>
+            <input type="text" class="form-input" id="setting-value" required placeholder="e.g., 30" style="width: 100%;" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-input" id="setting-description" placeholder="Describe this setting" style="width: 100%;" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-select" id="setting-category">
+              <option value="general">General</option>
+              <option value="notifications">Notifications</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="save-btn">Add Setting</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let settings = [];
+
+      const defaultSettings = [
+        { key: 'lab_report_deadline', value: '14', category: 'general' },
+        { key: 'max_samples_per_inspection', value: '10', category: 'general' },
+        { key: 'auto_submit_drafts', value: 'false', category: 'general' },
+        { key: 'email_notifications', value: 'true', category: 'notifications' },
+        { key: 'deadline_reminders', value: 'true', category: 'notifications' },
+        { key: 'reminder_days', value: '3', category: 'notifications' },
+        { key: 'workflow_node_edit_hours', value: '48', category: 'workflow' },
+        { key: 'workflow_allow_node_edit', value: 'true', category: 'workflow' },
+      ];
+
+      async function loadSettings() {
+        try {
+          const response = await fetch('/api/admin/settings');
+          settings = await response.json();
+          applySettings();
+        } catch (error) {
+          console.error('Failed to load settings:', error);
+        }
+      }
+
+      function applySettings() {
+        defaultSettings.forEach(ds => {
+          const saved = settings.find(s => s.key === ds.key);
+          const value = saved ? saved.value : ds.value;
+          
+          const el = document.getElementById(ds.key);
+          if (el) {
+            if (el.classList.contains('toggle')) {
+              if (value === 'true') {
+                el.classList.add('active');
+              } else {
+                el.classList.remove('active');
+              }
+            } else {
+              el.value = value;
+            }
+          }
+        });
+
+        const customSettings = settings.filter(s => !defaultSettings.find(ds => ds.key === s.key));
+        const container = document.getElementById('custom-settings');
+        
+        if (customSettings.length === 0) {
+          container.innerHTML = '<p style="color: #6b7280; font-size: 14px;">No custom settings configured</p>';
+        } else {
+          container.innerHTML = customSettings.map(s => `
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-label">${s.key}</div>
+                <div class="setting-desc">${s.description || 'No description'}</div>
+              </div>
+              <div class="setting-control">
+                <input type="text" class="form-input" id="custom_${s.key}" value="${s.value}" style="width: 150px;" />
+                <button class="delete-btn" onclick="deleteSetting('${s.key}')">Delete</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      function toggleSetting(el) {
+        el.classList.toggle('active');
+      }
+
+      function openModal() {
+        document.getElementById('modal').classList.add('show');
+        document.getElementById('setting-form').reset();
+      }
+
+      function closeModal() {
+        document.getElementById('modal').classList.remove('show');
+      }
+
+      async function deleteSetting(key) {
+        if (!confirm('Delete this setting?')) return;
+        try {
+          await fetch(`/api/admin/settings/${key}`, { method: 'DELETE' });
+          loadSettings();
+        } catch (error) {
+          alert('Failed to delete setting');
+        }
+      }
+
+      async function saveAllSettings() {
+        const allSettings = [];
+
+        defaultSettings.forEach(ds => {
+          const el = document.getElementById(ds.key);
+          if (el) {
+            let value;
+            if (el.classList.contains('toggle')) {
+              value = el.classList.contains('active') ? 'true' : 'false';
+            } else {
+              value = el.value;
+            }
+            allSettings.push({ key: ds.key, value, category: ds.category });
+          }
+        });
+
+        const customSettings = settings.filter(s => !defaultSettings.find(ds => ds.key === s.key));
+        customSettings.forEach(s => {
+          const el = document.getElementById(`custom_${s.key}`);
+          if (el) {
+            allSettings.push({ key: s.key, value: el.value, description: s.description, category: s.category });
+          }
+        });
+
+        try {
+          for (const setting of allSettings) {
+            await fetch('/api/admin/settings', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(setting),
+            });
+          }
+          
+          const msg = document.getElementById('success-message');
+          msg.classList.add('show');
+          setTimeout(() => msg.classList.remove('show'), 3000);
+        } catch (error) {
+          alert('Failed to save settings');
+        }
+      }
+
+      document.getElementById('setting-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const data = {
+          key: document.getElementById('setting-key').value,
+          value: document.getElementById('setting-value').value,
+          description: document.getElementById('setting-description').value,
+          category: document.getElementById('setting-category').value,
+        };
+
+        try {
+          const response = await fetch('/api/admin/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            closeModal();
+            loadSettings();
+          } else {
+            alert('Failed to add setting');
+          }
+        } catch (error) {
+          alert('Failed to add setting');
+        }
+      });
+
+      loadSettings();
+    </script>
+  </body>
+</html>
