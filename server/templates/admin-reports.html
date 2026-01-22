@@ -1,0 +1,269 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Reports & Analytics - Food Safety Inspector</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f3f4f6; min-height: 100vh; }
+      .header { background: #1E40AF; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+      .header-left { display: flex; align-items: center; gap: 12px; }
+      .header-logo { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+      .header-logo svg { width: 24px; height: 24px; fill: white; }
+      .header-title { font-size: 18px; font-weight: 600; }
+      .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; text-decoration: none; }
+      .back-btn:hover { background: rgba(255,255,255,0.2); }
+      .main { padding: 24px; max-width: 1400px; margin: 0 auto; }
+      .page-title { font-size: 24px; font-weight: 700; color: #1f2937; margin-bottom: 24px; }
+      .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+      .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+      .stat-value { font-size: 32px; font-weight: 700; color: #1f2937; }
+      .stat-label { font-size: 14px; color: #6b7280; margin-top: 4px; }
+      .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 24px; }
+      .chart-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+      .chart-title { font-size: 16px; font-weight: 600; color: #1f2937; margin-bottom: 16px; }
+      .chart-container { position: relative; height: 250px; }
+      .section-title { font-size: 18px; font-weight: 600; color: #1f2937; margin-bottom: 16px; }
+      .table-card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; margin-bottom: 24px; }
+      .table-header { padding: 16px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+      table { width: 100%; border-collapse: collapse; }
+      th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; }
+      td { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-size: 14px; color: #1f2937; }
+      tr:last-child td { border-bottom: none; }
+      .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+      .status-draft { background: #f3f4f6; color: #6b7280; }
+      .status-submitted { background: #dbeafe; color: #1E40AF; }
+      .status-closed { background: #d1fae5; color: #059669; }
+      .status-pending { background: #fef3c7; color: #d97706; }
+      .status-dispatched { background: #dbeafe; color: #1E40AF; }
+      .result-safe { background: #d1fae5; color: #059669; }
+      .result-unsafe { background: #fee2e2; color: #dc2626; }
+      .empty-row { padding: 40px; text-align: center; color: #6b7280; }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-left">
+        <div class="header-logo">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+        </div>
+        <div class="header-title">Reports & Analytics</div>
+      </div>
+      <a href="/admin/dashboard" class="back-btn">Back to Dashboard</a>
+    </header>
+
+    <main class="main">
+      <h1 class="page-title">Reports & Analytics</h1>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" id="total-inspections">0</div>
+          <div class="stat-label">Total Inspections</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="total-samples">0</div>
+          <div class="stat-label">Total Samples</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="safe-samples">0</div>
+          <div class="stat-label">Safe Samples</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="unsafe-samples">0</div>
+          <div class="stat-label">Unsafe Samples</div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title">Inspections by Status</div>
+          <div class="chart-container">
+            <canvas id="inspectionStatusChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Inspections by Type</div>
+          <div class="chart-container">
+            <canvas id="inspectionTypeChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Samples by Status</div>
+          <div class="chart-container">
+            <canvas id="sampleStatusChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Lab Results</div>
+          <div class="chart-container">
+            <canvas id="labResultsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <h2 class="section-title" style="margin: 0;">Recent Inspections</h2>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody id="inspections-table">
+            <tr><td colspan="4" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <h2 class="section-title" style="margin: 0;">Recent Samples</h2>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Lab Result</th>
+            </tr>
+          </thead>
+          <tbody id="samples-table">
+            <tr><td colspan="5" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <script>
+      const colors = {
+        primary: '#1E40AF',
+        success: '#059669',
+        warning: '#d97706',
+        danger: '#dc2626',
+        gray: '#6b7280',
+        lightBlue: '#60a5fa',
+        purple: '#8b5cf6',
+        pink: '#ec4899',
+      };
+
+      let inspectionStatusChart, inspectionTypeChart, sampleStatusChart, labResultsChart;
+
+      async function loadReports() {
+        try {
+          const response = await fetch('/api/admin/reports');
+          const data = await response.json();
+
+          document.getElementById('total-inspections').textContent = data.inspections.length;
+          document.getElementById('total-samples').textContent = data.samples.length;
+          
+          const safeSamples = data.samples.filter(s => s.labResult === 'not_unsafe' || s.labResult === 'safe').length;
+          const unsafeSamples = data.samples.filter(s => s.labResult === 'unsafe').length;
+          document.getElementById('safe-samples').textContent = safeSamples;
+          document.getElementById('unsafe-samples').textContent = unsafeSamples;
+
+          renderCharts(data.charts);
+          renderTables(data);
+        } catch (error) {
+          console.error('Failed to load reports:', error);
+        }
+      }
+
+      function renderCharts(charts) {
+        const ctx1 = document.getElementById('inspectionStatusChart').getContext('2d');
+        inspectionStatusChart = new Chart(ctx1, {
+          type: 'doughnut',
+          data: {
+            labels: charts.inspectionsByStatus.map(s => s.status || 'Unknown'),
+            datasets: [{
+              data: charts.inspectionsByStatus.map(s => s.count),
+              backgroundColor: [colors.primary, colors.success, colors.warning, colors.gray],
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        const ctx2 = document.getElementById('inspectionTypeChart').getContext('2d');
+        inspectionTypeChart = new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: charts.inspectionsByType.map(t => t.type || 'Unknown'),
+            datasets: [{
+              label: 'Count',
+              data: charts.inspectionsByType.map(t => t.count),
+              backgroundColor: colors.primary,
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        const ctx3 = document.getElementById('sampleStatusChart').getContext('2d');
+        sampleStatusChart = new Chart(ctx3, {
+          type: 'doughnut',
+          data: {
+            labels: charts.samplesByStatus.map(s => s.status || 'Unknown'),
+            datasets: [{
+              data: charts.samplesByStatus.map(s => s.count),
+              backgroundColor: [colors.warning, colors.lightBlue, colors.success, colors.gray],
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        const ctx4 = document.getElementById('labResultsChart').getContext('2d');
+        labResultsChart = new Chart(ctx4, {
+          type: 'pie',
+          data: {
+            labels: charts.samplesByResult.map(r => r.result === 'not_unsafe' ? 'Safe' : r.result === 'unsafe' ? 'Unsafe' : r.result || 'Pending'),
+            datasets: [{
+              data: charts.samplesByResult.map(r => r.count),
+              backgroundColor: [colors.success, colors.danger, colors.gray],
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+      }
+
+      function renderTables(data) {
+        const inspectionsTable = document.getElementById('inspections-table');
+        if (data.inspections.length === 0) {
+          inspectionsTable.innerHTML = '<tr><td colspan="4" class="empty-row">No inspections found</td></tr>';
+        } else {
+          inspectionsTable.innerHTML = data.inspections.slice(0, 10).map(i => `
+            <tr>
+              <td>${i.id.substring(0, 8)}...</td>
+              <td>${i.type}</td>
+              <td><span class="status-badge status-${i.status}">${i.status}</span></td>
+              <td>${new Date(i.createdAt).toLocaleDateString()}</td>
+            </tr>
+          `).join('');
+        }
+
+        const samplesTable = document.getElementById('samples-table');
+        if (data.samples.length === 0) {
+          samplesTable.innerHTML = '<tr><td colspan="5" class="empty-row">No samples found</td></tr>';
+        } else {
+          samplesTable.innerHTML = data.samples.slice(0, 10).map(s => `
+            <tr>
+              <td>${s.code}</td>
+              <td>${s.name}</td>
+              <td>${s.sampleType}</td>
+              <td><span class="status-badge status-${s.status}">${s.status}</span></td>
+              <td>${s.labResult ? `<span class="status-badge result-${s.labResult === 'unsafe' ? 'unsafe' : 'safe'}">${s.labResult === 'not_unsafe' ? 'Safe' : s.labResult}</span>` : '-'}</td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      loadReports();
+    </script>
+  </body>
+</html>
