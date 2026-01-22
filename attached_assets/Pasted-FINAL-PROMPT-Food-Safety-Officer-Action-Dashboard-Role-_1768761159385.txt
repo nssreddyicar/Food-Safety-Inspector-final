@@ -1,0 +1,189 @@
+FINAL PROMPT — Food Safety Officer Action Dashboard
+
+Role: You are a senior government e-governance product architect and compliance-driven dashboard designer.
+
+Objective: Design a centralized Action & Reminder Dashboard for Food Safety Officers that ensures no statutory, legal, or administrative action is missed.
+
+1️⃣ Dashboard Purpose
+
+The dashboard must act as a daily command center for Food Safety Officers by:
+
+Showing action-required items
+
+Sending timely reminders
+
+Tracking pending, overdue, and completed actions
+
+Supporting legal, enforcement, laboratory, and administrative workflows
+
+2️⃣ Action Categories (Mandatory)
+
+The dashboard must support the following action-required categories:
+
+Legal & Court
+
+Court cases
+
+Adjudication files to be filed
+
+Penalties
+
+Inspections & Enforcement
+
+Follow-up inspections
+
+Inspections pending
+
+Improvement notices
+
+Seized articles
+
+Destroyed articles
+
+Sampling & Laboratory
+
+Samples pending
+
+Lab reports received
+
+Lab reports not received
+
+Unsafe samples
+
+Sub-standard samples
+
+Misbranded samples
+
+Schedule IV cases
+
+Administrative & Compliance
+
+Special drives
+
+Workshops & trainings
+
+DLAC meetings
+
+FSSAI initiatives
+
+Protocol & Special Duties
+
+VVIP / ASL protocol duties
+
+3️⃣ Dashboard Structure
+
+Design the dashboard with:
+
+Action Cards / Tiles (one per category)
+
+Each card must display:
+
+Total items
+
+Pending
+
+Overdue
+
+Due today / this week
+
+Priority Indicators
+
+Critical (legal / unsafe / court-linked)
+
+High
+
+Normal
+
+4️⃣ Reminder & Alert Logic
+
+The system must support:
+
+Auto-generated reminders based on:
+
+Due dates
+
+Statutory timelines
+
+Lab report SLA
+
+Court / adjudication deadlines
+
+Reminder modes:
+
+In-app notification
+
+Dashboard highlight
+
+Escalation if overdue
+
+5️⃣ Action Drill-Down
+
+Clicking any dashboard item should open:
+
+Full case / inspection / sample details
+
+Current status
+
+Action history
+
+Next required action
+
+Responsible officer
+
+6️⃣ Status Lifecycle
+
+Each action item must support:
+
+Pending
+
+In Progress
+
+Completed
+
+Overdue
+
+With immutable audit logs for all changes.
+
+7️⃣ Personalization & Filters
+
+Allow officers to:
+
+View My Actions
+
+Filter by:
+
+Category
+
+Priority
+
+Date range
+
+Status
+
+8️⃣ Backend & Compliance Expectations
+
+Statutory deadline awareness
+
+Role-based visibility
+
+Offline support with sync
+
+Audit-ready logs
+
+Future reporting & export support
+
+9️⃣ Expected Output
+
+Provide:
+
+Dashboard layout & component structure
+
+Action categorization model
+
+Reminder & escalation logic
+
+Data model & APIs
+
+Edge cases & compliance safeguards
+
+Design for real-world government workflows, legal accountability, and zero-miss compliance.
