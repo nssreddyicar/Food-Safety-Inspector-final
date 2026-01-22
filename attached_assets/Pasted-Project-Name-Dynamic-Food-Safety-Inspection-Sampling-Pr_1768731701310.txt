@@ -1,0 +1,232 @@
+Project Name:
+Dynamic Food Safety Inspection, Sampling & Prosecution Management System
+
+Project Objective:
+Build a secure, scalable, government-grade system for Food Safety Officers (FSO), Designated Officers (DO), and Commissioner Food Safety to manage inspections, sampling, notices, adjudication, and prosecution workflows. The system must be fully dynamic, admin-controlled, legally compliant, and capable of automatically generating all statutory documents using templates and dynamic placeholders.
+
+Target Platforms:
+- Mobile App: Android (Flutter)
+- Admin & Authority Panel: Web (React)
+
+Operating Environment:
+Online-first with offline draft support for inspections and forms.
+
+Authentication & Access Model:
+- Invite-only user accounts created by Super Admin
+- No self-registration
+- Role-based access with strict permissions
+- District and jurisdiction-based data isolation
+
+User Roles:
+1. Food Safety Officer (FSO)
+2. Designated Officer (DO)
+3. Commissioner Food Safety
+4. Super Admin
+
+------------------------------------------------------------------
+CORE SYSTEM PRINCIPLE
+------------------------------------------------------------------
+All inspections, forms, documents, and legal steps must be driven by:
+- Dynamic form definitions (JSON-based)
+- Workflow states
+- Rule-based triggers
+- Versioned templates
+No inspection form, document, or workflow step should be hard-coded.
+
+------------------------------------------------------------------
+DYNAMIC INSPECTION FORM ENGINE
+------------------------------------------------------------------
+Super Admin Panel must provide a full Form Builder where Super Admin can:
+- Create inspection types (Routine, Special Drive, Complaint Based, VVIP, Initiatives, etc.)
+- Add / rename / disable inspection types
+- Create form sections, fields, dropdowns, checkboxes
+- Define conditional logic
+- Enable repeatable sections (deviations, samples, witnesses)
+- Version inspection forms (v1, v2, etc.)
+
+Inspection Form Requirements:
+- Inspection Type (dynamic)
+- Checkbox: FBO and Proprietor are same
+- Conditional FBO and Proprietor detail sections
+- Food license/registration Yes/No with conditional fields
+- Deviations: unlimited add/remove
+- Action Taken section (Super Admin–controlled options)
+- Sample Lifted section
+- Witness details with Aadhaar upload
+- Save as Draft / Submit
+
+------------------------------------------------------------------
+SAMPLE MANAGEMENT WORKFLOW (DYNAMIC)
+------------------------------------------------------------------
+If Sample Lifted:
+- Enable Sample Dispatch section per sample
+- Fields:
+  - Sample Name
+  - Sample Code
+  - Date & Place of Lifting
+  - Dispatch Date
+  - Dispatch Mode (Post / Courier / By Hand)
+  - Acknowledgement Upload
+  - Remarks
+
+System must automatically:
+- Start 14-day lab report countdown from dispatch date
+- Show countdown in dashboards
+- Flag overdue reports
+
+------------------------------------------------------------------
+LAB REPORT & COMMON LEGAL FLOW
+------------------------------------------------------------------
+When Lab Report is received (ANY result):
+- Result can be: Not Unsafe / Substandard / Unsafe
+- Lab report is locked after submission
+
+COMMON FLOW FOR SUBSTANDARD & UNSAFE:
+1. FSO submits Detailed Report to DO
+   - System auto-generates "FSO Detailed Report to DO"
+
+2. DO issues DO Notice to FBO
+   - Fields: Notice date, dispatch details, acknowledgement, remarks
+   - System auto-generates "DO Notice to FBO"
+
+------------------------------------------------------------------
+BRANCHING LOGIC AFTER DO NOTICE
+------------------------------------------------------------------
+
+IF Sample Result = Substandard:
+- Proceed with adjudication/compliance workflow
+- Commissioner involvement NOT required
+
+IF Sample Result = Unsafe:
+- Additional escalation required
+
+------------------------------------------------------------------
+UNSAFE SAMPLE – ESCALATION WORKFLOW
+------------------------------------------------------------------
+1. DO submits Detailed Report to Commissioner Food Safety
+   - System auto-generates "DO Detailed Report to Commissioner Food Safety"
+
+2. Commissioner Food Safety issues Prosecution Order
+   - Order number, date, court jurisdiction, authorised FSO
+   - System auto-generates "Prosecution Order of Commissioner Food Safety"
+
+3. FSO files Charge Sheet in Court
+   - System auto-compiles ALL relevant documents into a single court bundle PDF
+
+------------------------------------------------------------------
+AUTOMATIC DOCUMENT GENERATION
+------------------------------------------------------------------
+All documents must be generated automatically using:
+- Layout + Content templates
+- Context-aware dynamic placeholders
+
+Documents include (not limited to):
+- Inspection Report
+- Container Labels
+- Form VA, Form VI
+- Sample Dispatch Memo
+- Lab Report Attachment
+- FSO Report to DO
+- DO Notice to FBO
+- DO Report to Commissioner
+- Commissioner Prosecution Order
+- Adjudication Charge Sheet
+- AO Notice
+- Panchanama
+- Seizure Memo
+- Cash Receipt
+- 2nd, 3rd, 4th Part Sample Submission Letters
+- Court Charge Sheet Bundle
+
+Templates must support:
+- Auto page growth
+- Vector PDF output
+- Repeating headers/footers
+- Page numbers
+- Version locking
+
+------------------------------------------------------------------
+TEMPLATE & LAYOUT ENGINE
+------------------------------------------------------------------
+Super Admin Panel must allow:
+- Creation of reusable document layouts (A4)
+- Control over header, footer, logo, fonts, watermark
+- Content templates mapped to layouts
+- Placeholder registry visible to Super Admin
+- Conditional content blocks
+- Template versioning
+
+PDF Requirements:
+- Vector-based PDFs (HTML + CSS → PDF)
+- Text selectable & searchable
+- Supports digital signature later
+- Auto pagination based on content length
+
+------------------------------------------------------------------
+WORKFLOW ENGINE (SUPER ADMIN CONTROLLED)
+------------------------------------------------------------------
+Super Admin must be able to define rules such as:
+- Which document appears at which stage
+- Which role can act at which stage
+- Mandatory steps that cannot be skipped
+- Automatic locking after court filing
+
+------------------------------------------------------------------
+REPORTS & DASHBOARDS
+------------------------------------------------------------------
+Dashboards for:
+- FSO
+- DO
+- Commissioner Food Safety
+- Super Admin
+
+Reports:
+- Daily, Weekly, Monthly
+- Quarterly
+- Yearly
+- Financial Year
+- District-wise, Officer-wise, Sample-wise
+
+Export formats:
+- PDF, Excel, CSV
+
+------------------------------------------------------------------
+SECURITY & LEGAL COMPLIANCE
+------------------------------------------------------------------
+- JWT authentication
+- Role-based access control
+- District-level data isolation
+- Immutable audit logs
+- Document versioning
+- Post–court filing data lock
+- Secure file storage
+
+------------------------------------------------------------------
+TECH STACK
+------------------------------------------------------------------
+Mobile App: Flutter
+Admin Panel: React
+Backend: Node.js (Express)
+Database: PostgreSQL with JSON fields
+PDF Engine: HTML + CSS print-based rendering
+Hosting: AWS or Replit Deployments
+
+------------------------------------------------------------------
+LANGUAGE PREFERENCES
+------------------------------------------------------------------
+Replit Agent Interaction Language: English
+Application Interface Language: English (multi-language ready)
+
+------------------------------------------------------------------
+DELIVERABLES
+------------------------------------------------------------------
+- Flutter Android app
+- Web admin & authority panel
+- Dynamic inspection form engine
+- Workflow & rule engine
+- Template & layout engine
+- Vector PDF generation
+- Reporting engine
+- Deployment documentation
+
+Build with clean architecture, scalable design, and court-grade compliance.
