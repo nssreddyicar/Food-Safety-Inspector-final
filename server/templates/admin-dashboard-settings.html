@@ -1,0 +1,1083 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Dashboard Settings - Food Safety Inspector</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #f3f4f6;
+        min-height: 100vh;
+      }
+      .header {
+        background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+        color: white;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .header-logo {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+      .header-title {
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .header-subtitle {
+        font-size: 12px;
+        opacity: 0.8;
+      }
+      .back-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.2s;
+      }
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .main {
+        padding: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1f2937;
+      }
+      .page-subtitle {
+        color: #6b7280;
+        font-size: 14px;
+        margin-top: 4px;
+      }
+      .tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 24px;
+        background: white;
+        padding: 4px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .tab {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        transition: all 0.2s;
+      }
+      .tab:hover {
+        color: #1E40AF;
+        background: #f3f4f6;
+      }
+      .tab.active {
+        background: #1E40AF;
+        color: white;
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+      }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      .btn-primary {
+        background: #1E40AF;
+        color: white;
+      }
+      .btn-primary:hover {
+        background: #1e3a8a;
+      }
+      .btn-success {
+        background: #059669;
+        color: white;
+      }
+      .btn-success:hover {
+        background: #047857;
+      }
+      .btn-danger {
+        background: #DC2626;
+        color: white;
+      }
+      .btn-danger:hover {
+        background: #b91c1c;
+      }
+      .btn-secondary {
+        background: white;
+        color: #374151;
+        border: 1px solid #d1d5db;
+      }
+      .btn-secondary:hover {
+        background: #f9fafb;
+      }
+      .btn-group {
+        display: flex;
+        gap: 8px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        text-align: left;
+        padding: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #6b7280;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+        color: #374151;
+      }
+      tr:hover {
+        background: #f9fafb;
+      }
+      .toggle {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        background: #d1d5db;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .toggle.active {
+        background: #059669;
+      }
+      .toggle::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.2s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      .toggle.active::after {
+        transform: translateX(20px);
+      }
+      .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .badge-critical {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+      .badge-high {
+        background: #fef3c7;
+        color: #d97706;
+      }
+      .badge-normal {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .color-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .icon-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal.active {
+        display: flex;
+      }
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 500px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #6b7280;
+      }
+      .form-group {
+        margin-bottom: 16px;
+      }
+      .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 6px;
+      }
+      .form-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: #1E40AF;
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      }
+      .form-select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .drag-handle {
+        cursor: grab;
+        color: #9ca3af;
+        padding: 4px;
+      }
+      .drag-handle:active {
+        cursor: grabbing;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 48px;
+        color: #6b7280;
+      }
+      .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+      }
+      .alert {
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-size: 14px;
+      }
+      .alert-success {
+        background: #d1fae5;
+        color: #059669;
+      }
+      .alert-error {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-left">
+        <div class="header-logo">&#128737;</div>
+        <div>
+          <div class="header-title">Food Safety Inspector</div>
+          <div class="header-subtitle">Dashboard Settings Control</div>
+        </div>
+      </div>
+      <a href="/admin" class="back-btn">&#8592; Back to Admin</a>
+    </header>
+
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Dashboard Configuration</h1>
+          <p class="page-subtitle">Control all dashboard elements, statistics cards, and report layouts</p>
+        </div>
+      </div>
+
+      <div id="alert-container"></div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('action-categories')">Action Categories</button>
+        <button class="tab" onclick="switchTab('statistics-cards')">Statistics Cards</button>
+        <button class="tab" onclick="switchTab('report-layout')">Report Layout</button>
+      </div>
+
+      <!-- Action Categories Tab -->
+      <div id="action-categories" class="tab-content active">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Action Categories</h2>
+            <div class="btn-group">
+              <button class="btn btn-success" onclick="seedDefaultCategories()">Load Defaults</button>
+              <button class="btn btn-primary" onclick="showAddCategoryModal()">+ Add Category</button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px">&#8597;</th>
+                <th>Name</th>
+                <th>Group</th>
+                <th>Priority</th>
+                <th>SLA Days</th>
+                <th style="width:80px">Dashboard</th>
+                <th style="width:80px">Report</th>
+                <th style="width:80px">Enabled</th>
+                <th style="width:120px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="categories-table">
+              <tr><td colspan="9" class="empty-state">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Statistics Cards Tab -->
+      <div id="statistics-cards" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Statistics Cards</h2>
+            <div class="btn-group">
+              <button class="btn btn-success" onclick="seedDefaultStats()">Load Defaults</button>
+              <button class="btn btn-primary" onclick="showAddStatModal()">+ Add Card</button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px">&#8597;</th>
+                <th>Name</th>
+                <th>Group</th>
+                <th>Icon</th>
+                <th>Color</th>
+                <th>Type</th>
+                <th style="width:80px">Dashboard</th>
+                <th style="width:80px">Report</th>
+                <th style="width:80px">Enabled</th>
+                <th style="width:120px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="stats-table">
+              <tr><td colspan="10" class="empty-state">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Report Layout Tab -->
+      <div id="report-layout" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Report Sections</h2>
+            <div class="btn-group">
+              <button class="btn btn-success" onclick="seedDefaultReportSections()">Load Defaults</button>
+              <button class="btn btn-primary" onclick="showAddReportSectionModal()">+ Add Section</button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px">&#8597;</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th style="width:80px">PDF</th>
+                <th style="width:80px">Excel</th>
+                <th style="width:80px">Enabled</th>
+                <th style="width:120px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="report-sections-table">
+              <tr><td colspan="7" class="empty-state">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- Add/Edit Category Modal -->
+    <div id="category-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="category-modal-title">Add Category</h3>
+          <button class="modal-close" onclick="closeCategoryModal()">&times;</button>
+        </div>
+        <form id="category-form" onsubmit="saveCategory(event)">
+          <input type="hidden" id="cat-id">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-input" id="cat-name" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Code</label>
+              <input type="text" class="form-input" id="cat-code" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Group</label>
+              <select class="form-select" id="cat-group">
+                <option value="legal">Legal & Court</option>
+                <option value="inspection">Inspection & Enforcement</option>
+                <option value="sampling">Sampling & Laboratory</option>
+                <option value="administrative">Administrative</option>
+                <option value="protocol">Protocol & Duties</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Priority</label>
+              <select class="form-select" id="cat-priority">
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="normal">Normal</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">SLA Days</label>
+              <input type="number" class="form-input" id="cat-sla" value="7" min="1">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Icon</label>
+              <input type="text" class="form-input" id="cat-icon" value="alert-circle">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Color</label>
+              <input type="color" class="form-input" id="cat-color" value="#1E40AF">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Display Order</label>
+              <input type="number" class="form-input" id="cat-order" value="0" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Report Order</label>
+              <input type="number" class="form-input" id="cat-report-order" value="0" min="0">
+            </div>
+          </div>
+          <div class="btn-group" style="margin-top: 20px;">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-secondary" onclick="closeCategoryModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add/Edit Statistics Card Modal -->
+    <div id="stat-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="stat-modal-title">Add Statistics Card</h3>
+          <button class="modal-close" onclick="closeStatModal()">&times;</button>
+        </div>
+        <form id="stat-form" onsubmit="saveStatCard(event)">
+          <input type="hidden" id="stat-id">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-input" id="stat-name" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Code</label>
+              <input type="text" class="form-input" id="stat-code" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Group</label>
+              <select class="form-select" id="stat-group">
+                <option value="license">License</option>
+                <option value="inspection">Inspection</option>
+                <option value="sample">Sample</option>
+                <option value="legal">Legal</option>
+                <option value="financial">Financial</option>
+                <option value="general">General</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Value Type</label>
+              <select class="form-select" id="stat-value-type">
+                <option value="count">Count</option>
+                <option value="currency">Currency</option>
+                <option value="percentage">Percentage</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Display Order</label>
+              <input type="number" class="form-input" id="stat-order" value="0" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Icon</label>
+              <input type="text" class="form-input" id="stat-icon" value="bar-chart-2">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Color</label>
+              <input type="color" class="form-input" id="stat-color" value="#1E40AF">
+            </div>
+          </div>
+          <div class="btn-group" style="margin-top: 20px;">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-secondary" onclick="closeStatModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add/Edit Report Section Modal -->
+    <div id="report-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="report-modal-title">Add Report Section</h3>
+          <button class="modal-close" onclick="closeReportModal()">&times;</button>
+        </div>
+        <form id="report-form" onsubmit="saveReportSection(event)">
+          <input type="hidden" id="report-id">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-input" id="report-name" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Code</label>
+              <input type="text" class="form-input" id="report-code" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Section Type</label>
+              <select class="form-select" id="report-type">
+                <option value="summary">Summary</option>
+                <option value="table">Table</option>
+                <option value="statistics">Statistics</option>
+                <option value="chart">Chart</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Display Order</label>
+            <input type="number" class="form-input" id="report-order" value="0" min="0">
+          </div>
+          <div class="btn-group" style="margin-top: 20px;">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-secondary" onclick="closeReportModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let categories = [];
+      let statisticsCards = [];
+      let reportSections = [];
+
+      function switchTab(tabId) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+      }
+
+      function showAlert(message, type) {
+        const container = document.getElementById('alert-container');
+        container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        setTimeout(() => container.innerHTML = '', 3000);
+      }
+
+      async function fetchCategories() {
+        try {
+          const res = await fetch('/api/action-categories');
+          categories = await res.json();
+          renderCategories();
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+
+      function renderCategories() {
+        const tbody = document.getElementById('categories-table');
+        if (!categories.length) {
+          tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><div class="empty-state-icon">&#128203;</div>No categories found. Click "Load Defaults" to add default categories.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = categories.map(cat => `
+          <tr data-id="${cat.id}">
+            <td><span class="drag-handle">&#9776;</span></td>
+            <td><strong>${cat.name}</strong><br><small style="color:#6b7280">${cat.code}</small></td>
+            <td>${cat.group}</td>
+            <td><span class="badge badge-${cat.priority}">${cat.priority}</span></td>
+            <td>${cat.slaDefaultDays || 7}</td>
+            <td><div class="toggle ${cat.showOnDashboard ? 'active' : ''}" onclick="toggleCategoryField('${cat.id}', 'showOnDashboard', ${!cat.showOnDashboard})"></div></td>
+            <td><div class="toggle ${cat.showInReport ? 'active' : ''}" onclick="toggleCategoryField('${cat.id}', 'showInReport', ${!cat.showInReport})"></div></td>
+            <td><div class="toggle ${cat.isEnabled ? 'active' : ''}" onclick="toggleCategoryField('${cat.id}', 'isEnabled', ${!cat.isEnabled})"></div></td>
+            <td>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-secondary" onclick="editCategory('${cat.id}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCategory('${cat.id}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      async function toggleCategoryField(id, field, value) {
+        try {
+          await fetch(`/api/action-categories/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ [field]: value })
+          });
+          await fetchCategories();
+        } catch (error) {
+          showAlert('Error updating category', 'error');
+        }
+      }
+
+      async function seedDefaultCategories() {
+        try {
+          await fetch('/api/action-categories/seed-defaults', { method: 'POST' });
+          showAlert('Default categories loaded!', 'success');
+          await fetchCategories();
+        } catch (error) {
+          showAlert('Error loading defaults', 'error');
+        }
+      }
+
+      function showAddCategoryModal() {
+        document.getElementById('category-modal-title').textContent = 'Add Category';
+        document.getElementById('category-form').reset();
+        document.getElementById('cat-id').value = '';
+        document.getElementById('category-modal').classList.add('active');
+      }
+
+      function closeCategoryModal() {
+        document.getElementById('category-modal').classList.remove('active');
+      }
+
+      function editCategory(id) {
+        const cat = categories.find(c => c.id === id);
+        if (!cat) return;
+        document.getElementById('category-modal-title').textContent = 'Edit Category';
+        document.getElementById('cat-id').value = cat.id;
+        document.getElementById('cat-name').value = cat.name;
+        document.getElementById('cat-code').value = cat.code;
+        document.getElementById('cat-group').value = cat.group;
+        document.getElementById('cat-priority').value = cat.priority;
+        document.getElementById('cat-sla').value = cat.slaDefaultDays || 7;
+        document.getElementById('cat-icon').value = cat.icon;
+        document.getElementById('cat-color').value = cat.color;
+        document.getElementById('cat-order').value = cat.displayOrder;
+        document.getElementById('cat-report-order').value = cat.reportDisplayOrder || 0;
+        document.getElementById('category-modal').classList.add('active');
+      }
+
+      async function saveCategory(e) {
+        e.preventDefault();
+        const id = document.getElementById('cat-id').value;
+        const data = {
+          name: document.getElementById('cat-name').value,
+          code: document.getElementById('cat-code').value,
+          group: document.getElementById('cat-group').value,
+          priority: document.getElementById('cat-priority').value,
+          slaDefaultDays: parseInt(document.getElementById('cat-sla').value),
+          icon: document.getElementById('cat-icon').value,
+          color: document.getElementById('cat-color').value,
+          displayOrder: parseInt(document.getElementById('cat-order').value),
+          reportDisplayOrder: parseInt(document.getElementById('cat-report-order').value),
+          entityType: document.getElementById('cat-group').value
+        };
+        try {
+          if (id) {
+            await fetch(`/api/action-categories/${id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+          } else {
+            await fetch('/api/action-categories', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+          }
+          closeCategoryModal();
+          showAlert('Category saved!', 'success');
+          await fetchCategories();
+        } catch (error) {
+          showAlert('Error saving category', 'error');
+        }
+      }
+
+      async function deleteCategory(id) {
+        if (!confirm('Delete this category?')) return;
+        try {
+          await fetch(`/api/action-categories/${id}`, { method: 'DELETE' });
+          showAlert('Category deleted', 'success');
+          await fetchCategories();
+        } catch (error) {
+          showAlert('Error deleting category', 'error');
+        }
+      }
+
+      async function fetchStatisticsCards() {
+        try {
+          const res = await fetch('/api/statistics-cards');
+          statisticsCards = await res.json();
+          renderStatisticsCards();
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+
+      function renderStatisticsCards() {
+        const tbody = document.getElementById('stats-table');
+        if (!statisticsCards.length) {
+          tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><div class="empty-state-icon">&#128202;</div>No statistics cards found. Click "Load Defaults" to add default cards.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = statisticsCards.map(card => `
+          <tr data-id="${card.id}">
+            <td><span class="drag-handle">&#9776;</span></td>
+            <td><strong>${card.name}</strong><br><small style="color:#6b7280">${card.code}</small></td>
+            <td>${card.group}</td>
+            <td>${card.icon}</td>
+            <td><span class="color-dot" style="background:${card.color}"></span></td>
+            <td>${card.valueType}</td>
+            <td><div class="toggle ${card.showOnDashboard ? 'active' : ''}" onclick="toggleStatField('${card.id}', 'showOnDashboard', ${!card.showOnDashboard})"></div></td>
+            <td><div class="toggle ${card.showInReport ? 'active' : ''}" onclick="toggleStatField('${card.id}', 'showInReport', ${!card.showInReport})"></div></td>
+            <td><div class="toggle ${card.isEnabled ? 'active' : ''}" onclick="toggleStatField('${card.id}', 'isEnabled', ${!card.isEnabled})"></div></td>
+            <td>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-secondary" onclick="editStatCard('${card.id}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteStatCard('${card.id}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      async function toggleStatField(id, field, value) {
+        try {
+          await fetch(`/api/statistics-cards/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ [field]: value })
+          });
+          await fetchStatisticsCards();
+        } catch (error) {
+          showAlert('Error updating card', 'error');
+        }
+      }
+
+      async function seedDefaultStats() {
+        try {
+          await fetch('/api/statistics-cards/seed-defaults', { method: 'POST' });
+          showAlert('Default statistics cards loaded!', 'success');
+          await fetchStatisticsCards();
+        } catch (error) {
+          showAlert('Error loading defaults', 'error');
+        }
+      }
+
+      function showAddStatModal() {
+        document.getElementById('stat-modal-title').textContent = 'Add Statistics Card';
+        document.getElementById('stat-form').reset();
+        document.getElementById('stat-id').value = '';
+        document.getElementById('stat-modal').classList.add('active');
+      }
+
+      function closeStatModal() {
+        document.getElementById('stat-modal').classList.remove('active');
+      }
+
+      function editStatCard(id) {
+        const card = statisticsCards.find(c => c.id === id);
+        if (!card) return;
+        document.getElementById('stat-modal-title').textContent = 'Edit Statistics Card';
+        document.getElementById('stat-id').value = card.id;
+        document.getElementById('stat-name').value = card.name;
+        document.getElementById('stat-code').value = card.code;
+        document.getElementById('stat-group').value = card.group;
+        document.getElementById('stat-value-type').value = card.valueType;
+        document.getElementById('stat-order').value = card.displayOrder;
+        document.getElementById('stat-icon').value = card.icon;
+        document.getElementById('stat-color').value = card.color;
+        document.getElementById('stat-modal').classList.add('active');
+      }
+
+      async function saveStatCard(e) {
+        e.preventDefault();
+        const id = document.getElementById('stat-id').value;
+        const data = {
+          name: document.getElementById('stat-name').value,
+          code: document.getElementById('stat-code').value,
+          group: document.getElementById('stat-group').value,
+          valueType: document.getElementById('stat-value-type').value,
+          displayOrder: parseInt(document.getElementById('stat-order').value),
+          icon: document.getElementById('stat-icon').value,
+          color: document.getElementById('stat-color').value,
+          entityType: document.getElementById('stat-group').value
+        };
+        try {
+          if (id) {
+            await fetch(`/api/statistics-cards/${id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+          } else {
+            await fetch('/api/statistics-cards', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+          }
+          closeStatModal();
+          showAlert('Card saved!', 'success');
+          await fetchStatisticsCards();
+        } catch (error) {
+          showAlert('Error saving card', 'error');
+        }
+      }
+
+      async function deleteStatCard(id) {
+        if (!confirm('Delete this statistics card?')) return;
+        try {
+          await fetch(`/api/statistics-cards/${id}`, { method: 'DELETE' });
+          showAlert('Card deleted', 'success');
+          await fetchStatisticsCards();
+        } catch (error) {
+          showAlert('Error deleting card', 'error');
+        }
+      }
+
+      async function fetchReportSections() {
+        try {
+          const res = await fetch('/api/report-sections');
+          reportSections = await res.json();
+          renderReportSections();
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+
+      function renderReportSections() {
+        const tbody = document.getElementById('report-sections-table');
+        if (!reportSections.length) {
+          tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><div class="empty-state-icon">&#128196;</div>No report sections found. Click "Load Defaults" to add default sections.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = reportSections.map(section => `
+          <tr data-id="${section.id}">
+            <td><span class="drag-handle">&#9776;</span></td>
+            <td><strong>${section.name}</strong><br><small style="color:#6b7280">${section.code}</small></td>
+            <td>${section.sectionType}</td>
+            <td><div class="toggle ${section.showInPdf ? 'active' : ''}" onclick="toggleReportField('${section.id}', 'showInPdf', ${!section.showInPdf})"></div></td>
+            <td><div class="toggle ${section.showInExcel ? 'active' : ''}" onclick="toggleReportField('${section.id}', 'showInExcel', ${!section.showInExcel})"></div></td>
+            <td><div class="toggle ${section.isEnabled ? 'active' : ''}" onclick="toggleReportField('${section.id}', 'isEnabled', ${!section.isEnabled})"></div></td>
+            <td>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-secondary" onclick="editReportSection('${section.id}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteReportSection('${section.id}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      async function toggleReportField(id, field, value) {
+        try {
+          await fetch(`/api/report-sections/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ [field]: value })
+          });
+          await fetchReportSections();
+        } catch (error) {
+          showAlert('Error updating section', 'error');
+        }
+      }
+
+      async function seedDefaultReportSections() {
+        try {
+          await fetch('/api/report-sections/seed-defaults', { method: 'POST' });
+          showAlert('Default report sections loaded!', 'success');
+          await fetchReportSections();
+        } catch (error) {
+          showAlert('Error loading defaults', 'error');
+        }
+      }
+
+      function showAddReportSectionModal() {
+        document.getElementById('report-modal-title').textContent = 'Add Report Section';
+        document.getElementById('report-form').reset();
+        document.getElementById('report-id').value = '';
+        document.getElementById('report-modal').classList.add('active');
+      }
+
+      function closeReportModal() {
+        document.getElementById('report-modal').classList.remove('active');
+      }
+
+      function editReportSection(id) {
+        const section = reportSections.find(s => s.id === id);
+        if (!section) return;
+        document.getElementById('report-modal-title').textContent = 'Edit Report Section';
+        document.getElementById('report-id').value = section.id;
+        document.getElementById('report-name').value = section.name;
+        document.getElementById('report-code').value = section.code;
+        document.getElementById('report-type').value = section.sectionType;
+        document.getElementById('report-order').value = section.displayOrder;
+        document.getElementById('report-modal').classList.add('active');
+      }
+
+      async function saveReportSection(e) {
+        e.preventDefault();
+        const id = document.getElementById('report-id').value;
+        const data = {
+          name: document.getElementById('report-name').value,
+          code: document.getElementById('report-code').value,
+          sectionType: document.getElementById('report-type').value,
+          displayOrder: parseInt(document.getElementById('report-order').value)
+        };
+        try {
+          if (id) {
+            await fetch(`/api/report-sections/${id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+          } else {
+            await fetch('/api/report-sections', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+          }
+          closeReportModal();
+          showAlert('Section saved!', 'success');
+          await fetchReportSections();
+        } catch (error) {
+          showAlert('Error saving section', 'error');
+        }
+      }
+
+      async function deleteReportSection(id) {
+        if (!confirm('Delete this report section?')) return;
+        try {
+          await fetch(`/api/report-sections/${id}`, { method: 'DELETE' });
+          showAlert('Section deleted', 'success');
+          await fetchReportSections();
+        } catch (error) {
+          showAlert('Error deleting section', 'error');
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        fetchCategories();
+        fetchStatisticsCards();
+        fetchReportSections();
+      });
+    </script>
+  </body>
+</html>
