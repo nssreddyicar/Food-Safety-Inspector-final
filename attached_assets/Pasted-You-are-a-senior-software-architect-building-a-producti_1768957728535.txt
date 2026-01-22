@@ -1,0 +1,218 @@
+You are a senior software architect building a production-grade system.
+The application MUST be immediately deployable to:
+
+- Android Play Store
+- Web (Admin & Authority Panel)
+- Backend Server (API)
+- Database & Infrastructure
+
+The project must be structured so that ANY AI or developer can understand
+the purpose of each folder instantly, without reading the code first.
+
+------------------------------------------------
+MANDATORY ROOT STRUCTURE (STRICT)
+------------------------------------------------
+
+The root of the repository MUST contain the following top-level folders.
+Do NOT nest these inside each other.
+
+/
+├── android-app/        # Flutter Android app (Play Store ready)
+├── web-app/            # Web Admin & Authority Panel (browser deployable)
+├── backend/            # Business logic & services
+├── server/             # API, routing, authentication
+├── database/           # Schema, migrations, data access
+├── shared/             # Shared domain models & types
+├── infra/              # Deployment & infrastructure
+├── docs/               # Architecture & workflow documentation
+└── README.md           # Project overview
+
+Each folder MUST be independently buildable and deployable.
+
+------------------------------------------------
+ANDROID APP (android-app/)
+------------------------------------------------
+Purpose:
+- Android mobile application for officers and authorities
+- Must be Play Store ready
+
+Requirements:
+- Flutter project structure
+- pubspec.yaml at root of android-app/
+- AndroidManifest.xml properly configured
+- Environment-based configuration (dev, prod)
+
+Structure:
+android-app/
+├── lib/
+│   ├── main.dart
+│   ├── screens/
+│   ├── widgets/
+│   ├── state/
+│   ├── services/
+│   └── models/
+├── android/
+├── assets/
+└── pubspec.yaml
+
+Rules:
+- NO backend business logic
+- UI renders based on API responses
+- All workflow rules come from backend
+
+------------------------------------------------
+WEB APP (web-app/)
+------------------------------------------------
+Purpose:
+- Super Admin, FSO, DO, Commissioner dashboards
+- Browser deployable (cloud / on-prem)
+
+Requirements:
+- React-based structure
+- Environment-based builds
+- Role-based UI rendering
+
+Structure:
+web-app/
+├── src/
+│   ├── pages/
+│   ├── components/
+│   ├── services/
+│   ├── state/
+│   └── models/
+├── public/
+└── package.json
+
+Rules:
+- NO business logic
+- NO direct database access
+- UI reflects backend workflow state
+
+------------------------------------------------
+BACKEND (backend/)
+------------------------------------------------
+Purpose:
+- Core domain & business logic
+- Legal workflows
+- Rule enforcement
+
+Structure:
+backend/
+├── inspections/
+├── samples/
+├── jurisdictions/
+├── documents/
+├── workflows/
+└── services/
+
+Rules:
+- NO HTTP logic
+- NO UI logic
+- NO direct SQL
+
+------------------------------------------------
+SERVER / API (server/)
+------------------------------------------------
+Purpose:
+- HTTP APIs
+- Authentication & authorization
+- Request validation
+
+Structure:
+server/
+├── routes/
+├── controllers/
+├── middleware/
+├── auth/
+└── server.ts
+
+Rules:
+- Controllers must be thin
+- Only orchestrate backend services
+- No business rules here
+
+------------------------------------------------
+DATABASE (database/)
+------------------------------------------------
+Purpose:
+- Data persistence
+- Schema & migrations
+
+Structure:
+database/
+├── models/
+├── repositories/
+├── migrations/
+└── seeds/
+
+Rules:
+- NO business logic
+- Historical data must never be overwritten
+- Append-only where legally required
+
+------------------------------------------------
+SHARED (shared/)
+------------------------------------------------
+Purpose:
+- Shared domain models, enums, constants
+- Used by frontend, backend, and server
+
+Structure:
+shared/
+├── types/
+├── enums/
+└── schemas/
+
+Rules:
+- NO logic
+- NO side effects
+- Use domain language only
+
+------------------------------------------------
+INFRASTRUCTURE (infra/)
+------------------------------------------------
+Purpose:
+- Deployment & environment setup
+
+Structure:
+infra/
+├── docker/
+├── env/
+├── scripts/
+└── ci-cd/
+
+Rules:
+- No domain logic
+- Clear separation of environments
+
+------------------------------------------------
+DOCUMENTATION (docs/)
+------------------------------------------------
+Purpose:
+- Architecture explanation
+- Workflow diagrams
+- Legal & audit notes
+
+------------------------------------------------
+DOCUMENTATION RULES (MANDATORY)
+------------------------------------------------
+- Every folder must contain a README.md explaining:
+  - Purpose
+  - What it MUST NOT contain
+  - How it is deployed
+- Code must be understandable without external context
+- Assume another AI will maintain this system
+
+------------------------------------------------
+FINAL INSTRUCTION
+------------------------------------------------
+Generate the full folder structure first.
+Then generate example files for each folder with
+detailed comments explaining intent, boundaries, and usage.
+
+The output must be immediately deployable for:
+- Android Play Store
+- Web hosting
+- Backend server
+
+Clarity and structure are more important than brevity.
